@@ -1,0 +1,74 @@
+managed implementation in class ZBP_R_PR_CSD_MAT unique;
+strict ( 2 );
+with draft;
+define behavior for ZR_PR_CSD_MAT alias Materials
+persistent table ZPR_CSD_MAT
+draft table ZPR_CSD_MAT_D
+etag master Locallastchangedat
+lock master total etag Lastchangedat
+authorization master( global )
+
+{
+  field ( mandatory : create )
+   Salesorg,
+   Distchannel,
+   Division,
+   Material;
+
+  field ( readonly )
+   Localcreatedby,
+   Localcreatedat,
+   Locallastchangedby,
+   Locallastchangedat,
+   Lastchangedat;
+
+  field ( readonly : update )
+   Salesorg,
+   Distchannel,
+   Division,
+   Material;
+
+  create;
+  update;
+  delete;
+
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Edit;
+  draft action Resume;
+  draft determine action Prepare;
+
+  mapping for ZPR_CSD_MAT
+  {
+    Salesorg = salesorg;
+    Distchannel = distchannel;
+    Division = division;
+    Material = material;
+    Description = description;
+    Config = config;
+    GpZpxCurr = gpzpxcurr;
+    GpZprCurr = gpzprcurr;
+    Zp1Curr = zp1curr;
+    ZgoCurr = zgocurr;
+    ZpxCurr = zpxcurr;
+    Zpr02Curr = zpr02curr;
+    Zpr03Curr = zpr03curr;
+    Zpr04Curr = zpr04curr;
+    Zpr05Curr = zpr05curr;
+    Zpr06Curr = zpr06curr;
+    Zpr07Curr = zpr07curr;
+    Zpr08Curr = zpr08curr;
+    Zpr09Curr = zpr09curr;
+    Zpr10Curr = zpr10curr;
+    Zpr11Curr = zpr11curr;
+    Zpr12Curr = zpr12curr;
+    Zpr13Curr = zpr13curr;
+    Zpr14Curr = zpr14curr;
+    Zpr15Curr = zpr15curr;
+    Localcreatedby = localcreatedby;
+    Localcreatedat = localcreatedat;
+    Locallastchangedby = locallastchangedby;
+    Locallastchangedat = locallastchangedat;
+    Lastchangedat = lastchangedat;
+  }
+}

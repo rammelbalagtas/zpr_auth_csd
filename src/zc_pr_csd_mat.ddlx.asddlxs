@@ -1,0 +1,379 @@
+@Metadata.layer: #CORE
+@UI.headerInfo.title.type: #STANDARD
+@UI.headerInfo.title.value: 'Salesorg'
+@UI.headerInfo.description.type: #STANDARD
+@UI.headerInfo.description.value: 'Salesorg'
+annotate view ZC_PR_CSD_MAT with
+{
+  @EndUserText.label: 'Salesorg'
+  @UI.facet: [ {
+    label: 'General Information', 
+    id: 'GeneralInfo', 
+    purpose: #STANDARD, 
+    position: 10 , 
+    type: #IDENTIFICATION_REFERENCE
+  } ]
+  @UI.identification: [ {
+    position: 10 
+  } ]
+  @UI.lineItem: [ {
+    position: 10 
+  } ]
+  @UI.selectionField: [ {
+    position: 10 
+  } ]
+  Salesorg;
+  
+  @EndUserText.label: 'Distchannel'
+  @UI.identification: [ {
+    position: 20 
+  } ]
+  @UI.lineItem: [ {
+    position: 20 
+  } ]
+  @UI.selectionField: [ {
+    position: 20 
+  } ]
+  Distchannel;
+  
+  @EndUserText.label: 'Division'
+  @UI.identification: [ {
+    position: 30 
+  } ]
+  @UI.lineItem: [ {
+    position: 30 
+  } ]
+  @UI.selectionField: [ {
+    position: 30 
+  } ]
+  Division;
+  
+  @EndUserText.label: 'Material'
+  @UI.identification: [ {
+    position: 40 
+  } ]
+  @UI.lineItem: [ {
+    position: 40 
+  } ]
+  @UI.selectionField: [ {
+    position: 40 
+  } ]
+  Material;
+  
+  @EndUserText.label: 'Description'
+  @UI.identification: [ {
+    position: 50 
+  } ]
+  @UI.lineItem: [ {
+    position: 50 
+  } ]
+  @UI.selectionField: [ {
+    position: 50 
+  } ]
+  Description;
+  
+  @EndUserText.label: 'Configured Product'
+  @UI.identification: [ {
+    position: 51 
+  } ]
+  @UI.lineItem: [ {
+    position: 51 
+  } ]
+  @UI.selectionField: [ {
+    position: 51 
+  } ]
+  config;
+  
+  @EndUserText.label: 'GpZpxCurr'
+  @UI.identification: [ {
+    position: 60 
+  } ]
+  @UI.lineItem: [ {
+    position: 60 
+  } ]
+  @UI.selectionField: [ {
+    position: 60 
+  } ]
+  GpZpxCurr;
+  
+  @EndUserText.label: 'GpZprCurr'
+  @UI.identification: [ {
+    position: 70 
+  } ]
+  @UI.lineItem: [ {
+    position: 70 
+  } ]
+  @UI.selectionField: [ {
+    position: 70 
+  } ]
+  GpZprCurr;
+  
+  @EndUserText.label: 'Zp1Curr'
+  @UI.identification: [ {
+    position: 80 
+  } ]
+  @UI.lineItem: [ {
+    position: 80 
+  } ]
+  @UI.selectionField: [ {
+    position: 80 
+  } ]
+  Zp1Curr;
+  
+  @EndUserText.label: 'ZgoCurr'
+  @UI.identification: [ {
+    position: 90 
+  } ]
+  @UI.lineItem: [ {
+    position: 90 
+  } ]
+  @UI.selectionField: [ {
+    position: 90 
+  } ]
+  ZgoCurr;
+  
+  @EndUserText.label: 'ZpxCurr'
+  @UI.identification: [ {
+    position: 100 
+  } ]
+  @UI.lineItem: [ {
+    position: 100 
+  } ]
+  @UI.selectionField: [ {
+    position: 100 
+  } ]
+  ZpxCurr;
+  
+  @EndUserText.label: 'Zpr02Curr'
+  @UI.identification: [ {
+    position: 110 
+  } ]
+  @UI.lineItem: [ {
+    position: 110 
+  } ]
+  @UI.selectionField: [ {
+    position: 110 
+  } ]
+  Zpr02Curr;
+  
+  @EndUserText.label: 'Zpr03Curr'
+  @UI.identification: [ {
+    position: 120 
+  } ]
+  @UI.lineItem: [ {
+    position: 120 
+  } ]
+  @UI.selectionField: [ {
+    position: 120 
+  } ]
+  Zpr03Curr;
+  
+  @EndUserText.label: 'Zpr04Curr'
+  @UI.identification: [ {
+    position: 130 
+  } ]
+  @UI.lineItem: [ {
+    position: 130 
+  } ]
+  @UI.selectionField: [ {
+    position: 130 
+  } ]
+  Zpr04Curr;
+  
+  @EndUserText.label: 'Zpr05Curr'
+  @UI.identification: [ {
+    position: 140 
+  } ]
+  @UI.lineItem: [ {
+    position: 140 
+  } ]
+  @UI.selectionField: [ {
+    position: 140 
+  } ]
+  Zpr05Curr;
+  
+  @EndUserText.label: 'Zpr06Curr'
+  @UI.identification: [ {
+    position: 150 
+  } ]
+  @UI.lineItem: [ {
+    position: 150 
+  } ]
+  @UI.selectionField: [ {
+    position: 150 
+  } ]
+  Zpr06Curr;
+  
+  @EndUserText.label: 'Zpr07Curr'
+  @UI.identification: [ {
+    position: 160 
+  } ]
+  @UI.lineItem: [ {
+    position: 160 
+  } ]
+  @UI.selectionField: [ {
+    position: 160 
+  } ]
+  Zpr07Curr;
+  
+  @EndUserText.label: 'Zpr08Curr'
+  @UI.identification: [ {
+    position: 170 
+  } ]
+  @UI.lineItem: [ {
+    position: 170 
+  } ]
+  @UI.selectionField: [ {
+    position: 170 
+  } ]
+  Zpr08Curr;
+  
+  @EndUserText.label: 'Zpr09Curr'
+  @UI.identification: [ {
+    position: 180 
+  } ]
+  @UI.lineItem: [ {
+    position: 180 
+  } ]
+  @UI.selectionField: [ {
+    position: 180 
+  } ]
+  Zpr09Curr;
+  
+  @EndUserText.label: 'Zpr10Curr'
+  @UI.identification: [ {
+    position: 190 
+  } ]
+  @UI.lineItem: [ {
+    position: 190 
+  } ]
+  @UI.selectionField: [ {
+    position: 190 
+  } ]
+  Zpr10Curr;
+  
+  @EndUserText.label: 'Zpr11Curr'
+  @UI.identification: [ {
+    position: 200 
+  } ]
+  @UI.lineItem: [ {
+    position: 200 
+  } ]
+  @UI.selectionField: [ {
+    position: 200 
+  } ]
+  Zpr11Curr;
+  
+  @EndUserText.label: 'Zpr12Curr'
+  @UI.identification: [ {
+    position: 210 
+  } ]
+  @UI.lineItem: [ {
+    position: 210 
+  } ]
+  @UI.selectionField: [ {
+    position: 210 
+  } ]
+  Zpr12Curr;
+  
+  @EndUserText.label: 'Zpr13Curr'
+  @UI.identification: [ {
+    position: 220 
+  } ]
+  @UI.lineItem: [ {
+    position: 220 
+  } ]
+  @UI.selectionField: [ {
+    position: 220 
+  } ]
+  Zpr13Curr;
+  
+  @EndUserText.label: 'Zpr14Curr'
+  @UI.identification: [ {
+    position: 230 
+  } ]
+  @UI.lineItem: [ {
+    position: 230 
+  } ]
+  @UI.selectionField: [ {
+    position: 230 
+  } ]
+  Zpr14Curr;
+  
+  @EndUserText.label: 'Zpr15Curr'
+  @UI.identification: [ {
+    position: 240 
+  } ]
+  @UI.lineItem: [ {
+    position: 240 
+  } ]
+  @UI.selectionField: [ {
+    position: 240 
+  } ]
+  Zpr15Curr;
+  
+  @UI.identification: [ {
+    position: 250 , 
+    label: 'Created By'
+  } ]
+  @UI.lineItem: [ {
+    position: 250 , 
+    label: 'Created By'
+  } ]
+  @UI.selectionField: [ {
+    position: 250 
+  } ]
+  Localcreatedby;
+  
+  @UI.identification: [ {
+    position: 260 , 
+    label: 'Created On'
+  } ]
+  @UI.lineItem: [ {
+    position: 260 , 
+    label: 'Created On'
+  } ]
+  @UI.selectionField: [ {
+    position: 260 
+  } ]
+  Localcreatedat;
+  
+  @UI.identification: [ {
+    position: 270 , 
+    label: 'Changed By'
+  } ]
+  @UI.lineItem: [ {
+    position: 270 , 
+    label: 'Changed By'
+  } ]
+  @UI.selectionField: [ {
+    position: 270 
+  } ]
+  Locallastchangedby;
+  
+  @UI.identification: [ {
+    position: 280 , 
+    label: 'Changed On'
+  } ]
+  @UI.lineItem: [ {
+    position: 280 , 
+    label: 'Changed On'
+  } ]
+  @UI.selectionField: [ {
+    position: 280 
+  } ]
+  Locallastchangedat;
+  
+  @UI.identification: [ {
+    position: 290 , 
+    label: 'Changed On'
+  } ]
+  @UI.lineItem: [ {
+    position: 290 , 
+    label: 'Changed On'
+  } ]
+  @UI.selectionField: [ {
+    position: 290 
+  } ]
+  Lastchangedat;
+}

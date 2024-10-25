@@ -1,0 +1,11 @@
+@EndUserText: {
+  label: 'Service Definition for ZC_PR_IMPFG'
+}
+@ObjectModel: {
+  leadingEntity: {
+    name: 'ZC_PR_IMPFG'
+  }
+}
+define service ZUI_PR_IMPFG_O4 provider contracts odata_v4_ui {
+  expose ZC_PR_IMPFG;
+}

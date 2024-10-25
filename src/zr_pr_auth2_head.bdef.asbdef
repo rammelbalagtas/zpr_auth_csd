@@ -1,0 +1,266 @@
+managed implementation in class zbp_r_pr_auth2_head unique;
+strict ( 1 );
+with draft;
+
+define behavior for ZR_PR_AUTH2_HEAD alias Header
+persistent table zpr_auth2_head
+draft table zdpr_auth2_head
+etag master Locallastchangedat
+lock master total etag Lastchangedat
+early numbering
+authorization master ( instance )
+{
+  create;
+  update;
+  delete;
+  field ( readonly ) PriceAuth, SalesOrg, DistChannel, AttachmentDownload;
+  field ( mandatory ) Description, ValidFrom, ValidTo, SubmittedTo, Division;
+  association _Items { create; with draft; }
+  association _ImpactedGoods { internal create; with draft; }
+  association _Messages { internal create; with draft; }
+  association _Notes { create; with draft; }
+
+  determination setDefaultValues on modify { create; }
+
+  draft action Edit;
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare;
+
+  action importFile result [1] $self;
+  action exportFile result [1] $self;
+  action validateEntries;
+  action submit result [1] entity ZR_PR_AUTH2_HEAD;
+
+  side effects
+  {
+    action exportFile affects $self;
+    action importFile affects entity _Items, entity _ImpactedGoods;
+    action submit affects $self;
+    action validateEntries affects entity _ImpactedGoods;
+  }
+
+  mapping for zpr_auth2_head
+    {
+      PriceAuth          = price_auth;
+      highpriority       = high_priority;
+      description        = description;
+      ValidFrom          = valid_from;
+      ValidTo            = valid_to;
+      status             = status;
+      SalesOrg           = SalesOrg;
+      DistChannel        = DistChannel;
+      Division           = Division;
+      submittedto        = submitted_to;
+      notify             = notify;
+      attachmentupload   = attachment_u;
+      mimetypeUpload     = mimetype_u;
+      filenameUpload     = filename_u;
+      attachmentDownload = attachment_d;
+      mimetypeDownload   = mimetype_d;
+      filenameDownload   = filename_d;
+      LocalCreatedBy     = localcreatedby;
+      LocalCreatedAt     = localcreatedat;
+      LocalLastChangedBy = locallastchangedby;
+      LocalLastChangedAt = locallastchangedat;
+      LastChangedAt      = lastchangedat;
+    }
+}
+
+define behavior for ZR_PR_AUTH2_ITEM alias Items
+persistent table zpr_auth2_item
+draft table zdpr_auth2_item
+lock dependent by _Header
+authorization dependent by _Header
+etag master LocalLastChangedAt
+{
+  update;
+  delete;
+  field ( readonly ) Map, PriceAuth, GpZpxCurr, GpZpxNew, GpZprCurr, GpZprNew, Zp1Curr, ZgoCurr, ZpxCurr,
+  Zpr02Curr, Zpr03Curr, Zpr04Curr, Zpr05Curr, Zpr06Curr, Zpr07Curr, Zpr08Curr, Zpr09Curr, Zpr10Curr, Zpr11Curr, Zpr12Curr, Zpr13Curr, Zpr14Curr, Zpr15Curr;
+  field ( readonly : update ) Material;
+  field ( mandatory : create ) Material;
+  association _Header { with draft; }
+
+  determination onSelectMaterial on modify { create; field Material; }
+
+  mapping for zpr_auth2_item
+    {
+      PriceAuth          = price_auth;
+      Material           = material;
+      Sequence           = Sequence;
+      ItemType           = Item_Type;
+      Status             = Status;
+      Map                = Map;
+      Unit               = Unit;
+      Currency           = Currency;
+      GpZpxCurr          = Gp_Zpx_Curr;
+      GpZpxNew           = Gp_Zpx_New;
+      GpZprCurr          = Gp_Zpr_Curr;
+      GpZprNew           = Gp_Zpr_New;
+      Zp1Curr            = Zp1_Curr;
+      Zp1New             = Zp1_New;
+      ZgoCurr            = Zgo_Curr;
+      ZgoNew             = Zgo_New;
+      ZpxCurr            = Zpx_Curr;
+      ZpxNew             = Zpx_New;
+      Zpr02Curr          = Zpr02_Curr;
+      Zpr02New           = Zpr02_New;
+      Zpr03Curr          = Zpr03_Curr;
+      Zpr03New           = Zpr03_New;
+      Zpr04Curr          = Zpr04_Curr;
+      Zpr04New           = Zpr04_New;
+      Zpr05Curr          = Zpr05_Curr;
+      Zpr05New           = Zpr05_New;
+      Zpr06Curr          = Zpr06_Curr;
+      Zpr06New           = Zpr06_New;
+      Zpr07Curr          = Zpr07_Curr;
+      Zpr07New           = Zpr07_New;
+      Zpr08Curr          = Zpr08_Curr;
+      Zpr08New           = Zpr08_New;
+      Zpr09Curr          = Zpr09_Curr;
+      Zpr09New           = Zpr09_New;
+      Zpr10Curr          = Zpr10_Curr;
+      Zpr10New           = Zpr10_New;
+      Zpr11Curr          = Zpr11_Curr;
+      Zpr11New           = Zpr11_New;
+      Zpr12Curr          = Zpr12_Curr;
+      Zpr12New           = Zpr12_New;
+      Zpr13Curr          = Zpr13_Curr;
+      Zpr13New           = Zpr13_New;
+      Zpr14Curr          = Zpr14_Curr;
+      Zpr14New           = Zpr14_New;
+      Zpr15Curr          = Zpr15_Curr;
+      Zpr15New           = Zpr15_New;
+      LocalCreatedBy     = localcreatedby;
+      Localcreatedat     = Localcreatedat;
+      Locallastchangedby = Locallastchangedby;
+      Locallastchangedat = Locallastchangedat;
+      Lastchangedat      = Lastchangedat;
+    }
+
+}
+
+define behavior for ZR_PR_AUTH2_IMPFG alias ImpactedGoods
+persistent table zpr_auth2_impfg
+draft table zdpr_auth2_impfg
+lock dependent by _Header
+authorization dependent by _Header
+etag master LocalLastChangedAt
+{
+  internal update;
+  internal delete;
+  field ( readonly ) PriceAuth, Material;
+  association _Header { with draft; }
+
+  mapping for zpr_auth2_impfg
+    {
+      PriceAuth          = price_auth;
+      Material           = material;
+      Sequence           = Sequence;
+      ItemType           = Item_Type;
+      Status             = Status;
+      Map                = Map;
+      Unit               = Unit;
+      Currency           = Currency;
+      GpZpxCurr          = Gp_Zpx_Curr;
+      GpZpxNew           = Gp_Zpx_New;
+      GpZprCurr          = Gp_Zpr_Curr;
+      GpZprNew           = Gp_Zpr_New;
+      Zp1Curr            = Zp1_Curr;
+      Zp1New             = Zp1_New;
+      ZgoCurr            = Zgo_Curr;
+      ZgoNew             = Zgo_New;
+      ZpxCurr            = Zpx_Curr;
+      ZpxNew             = Zpx_New;
+      Zpr02Curr          = Zpr02_Curr;
+      Zpr02New           = Zpr02_New;
+      Zpr03Curr          = Zpr03_Curr;
+      Zpr03New           = Zpr03_New;
+      Zpr04Curr          = Zpr04_Curr;
+      Zpr04New           = Zpr04_New;
+      Zpr05Curr          = Zpr05_Curr;
+      Zpr05New           = Zpr05_New;
+      Zpr06Curr          = Zpr06_Curr;
+      Zpr06New           = Zpr06_New;
+      Zpr07Curr          = Zpr07_Curr;
+      Zpr07New           = Zpr07_New;
+      Zpr08Curr          = Zpr08_Curr;
+      Zpr08New           = Zpr08_New;
+      Zpr09Curr          = Zpr09_Curr;
+      Zpr09New           = Zpr09_New;
+      Zpr10Curr          = Zpr10_Curr;
+      Zpr10New           = Zpr10_New;
+      Zpr11Curr          = Zpr11_Curr;
+      Zpr11New           = Zpr11_New;
+      Zpr12Curr          = Zpr12_Curr;
+      Zpr12New           = Zpr12_New;
+      Zpr13Curr          = Zpr13_Curr;
+      Zpr13New           = Zpr13_New;
+      Zpr14Curr          = Zpr14_Curr;
+      Zpr14New           = Zpr14_New;
+      Zpr15Curr          = Zpr15_Curr;
+      Zpr15New           = Zpr15_New;
+      LocalCreatedBy     = localcreatedby;
+      Localcreatedat     = Localcreatedat;
+      Locallastchangedby = Locallastchangedby;
+      Locallastchangedat = Locallastchangedat;
+      Lastchangedat      = Lastchangedat;
+    }
+}
+
+define behavior for ZR_PR_AUTH2_MSGS alias Messages
+persistent table zpr_auth2_msgs
+draft table zdpr_auth2_msgs
+lock dependent by _Header
+authorization dependent by _Header
+etag master LocalLastChangedAt
+{
+  internal update;
+  internal delete;
+  field ( readonly ) PriceAuth, Sequence;
+  association _Header { with draft; }
+
+  mapping for zpr_auth2_msgs
+    {
+      PriceAuth          = price_auth;
+      Sequence           = sequence;
+      Material           = material;
+      MessageType        = messagetype;
+      Message            = message;
+      LocalCreatedBy     = localcreatedby;
+      Localcreatedat     = Localcreatedat;
+      Locallastchangedby = Locallastchangedby;
+      Locallastchangedat = Locallastchangedat;
+      Lastchangedat      = Lastchangedat;
+    }
+}
+
+define behavior for ZR_PR_AUTH2_NOTE alias Notes
+persistent table zpr_auth2_note
+draft table zdpr_auth2_note
+lock dependent by _Header
+authorization dependent by _Header
+etag master LocalLastChangedAt
+{
+  update;
+  internal delete;
+  field ( readonly ) PriceAuth, LocalCreatedBy, LocalCreatedAt;
+  field ( readonly, numbering : managed ) Id;
+  field ( readonly : update ) Note;
+  field ( mandatory : create ) Note;
+  association _Header { with draft; }
+
+  mapping for zpr_auth2_note
+    {
+      PriceAuth          = price_auth;
+      id                 = id;
+      Note               = note;
+      LocalCreatedBy     = localcreatedby;
+      Localcreatedat     = Localcreatedat;
+      Locallastchangedby = Locallastchangedby;
+      Locallastchangedat = Locallastchangedat;
+      Lastchangedat      = Lastchangedat;
+    }
+}

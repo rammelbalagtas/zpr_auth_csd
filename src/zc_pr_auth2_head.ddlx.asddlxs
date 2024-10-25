@@ -1,0 +1,218 @@
+@Metadata.layer: #CORE
+
+@UI: { headerInfo: { typeName:       'Price Authorization',
+                     typeNamePlural: 'Price Authorization',
+                     title:          { type: #STANDARD,
+                                       label: 'Price Authorization',
+                                       value: 'PriceAuth' } } }
+annotate entity ZC_PR_AUTH2_HEAD with
+{
+  //  @UI.facet:
+  //      [{
+  //          id         : 'Header',
+  //          purpose    : #STANDARD,
+  //          position   : 10,
+  //          label      : 'Header',
+  //          type: #IDENTIFICATION_REFERENCE
+  //      },
+  //      {
+  //          id         : 'Material',
+  //          purpose    : #STANDARD,
+  //          position   : 20,
+  //          label      : 'Materials',
+  //          type       :  #LINEITEM_REFERENCE,
+  //          targetElement: '_Items'
+  //      },
+  //      {
+  //          id         : 'ImpactedGoods',
+  //          purpose    : #STANDARD,
+  //          position   : 30,
+  //          label      : 'Impacted Goods',
+  //          type       :  #LINEITEM_REFERENCE,
+  //          targetElement: '_ImpactedGoods'
+  //      },
+  //      {
+  //          id         : 'Messages',
+  //          purpose    : #STANDARD,
+  //          position   : 40,
+  //          label      : 'Messages',
+  //          type       :  #LINEITEM_REFERENCE,
+  //          targetElement: '_Messages'
+  //      },
+  //      {
+  //          id         : 'Notes',
+  //          purpose    : #STANDARD,
+  //          position   : 40,
+  //          label      : 'Notes',
+  //          type       :  #LINEITEM_REFERENCE,
+  //          targetElement: '_Notes'
+  //      }
+  //      ]
+
+  @UI.facet: [
+       {
+         purpose: #STANDARD,
+         id: 'Header',
+         label: 'Header',
+         position   : 10,
+         type: #COLLECTION
+       },
+       {
+         parentId   : 'Header',
+         label      : 'General Data',
+         type       : #FIELDGROUP_REFERENCE,
+         position   : 10,
+         targetQualifier: 'GeneralData'
+       },
+       {
+         parentId   : 'Header',
+         label      : 'Validity',
+         type       : #FIELDGROUP_REFERENCE,
+         position   : 20,
+         targetQualifier: 'Validity'
+       },
+       {
+         parentId   : 'Header',
+         label      : 'Sales Area',
+         type       : #FIELDGROUP_REFERENCE,
+         position   : 30,
+         targetQualifier: 'SalesArea'
+       },
+       {
+         parentId   : 'Header',
+         label      : 'File Processing',
+         type       : #FIELDGROUP_REFERENCE,
+         position   : 40,
+         targetQualifier: 'FileProcessing'
+       },
+         {
+             id         : 'Material',
+             purpose    : #STANDARD,
+             position   : 20,
+             label      : 'Materials',
+             type       :  #LINEITEM_REFERENCE,
+             targetElement: '_Items'
+         },
+         {
+             id         : 'ImpactedGoods',
+             purpose    : #STANDARD,
+             position   : 30,
+             label      : 'Impacted Finished Goods',
+             type       :  #LINEITEM_REFERENCE,
+             targetElement: '_ImpactedGoods'
+         },
+         {
+             id         : 'Messages',
+             purpose    : #STANDARD,
+             position   : 40,
+             label      : 'Messages',
+             type       :  #LINEITEM_REFERENCE,
+             targetElement: '_Messages'
+         },
+         {
+             id         : 'Notes',
+             purpose    : #STANDARD,
+             position   : 40,
+             label      : 'Notes',
+             type       :  #LINEITEM_REFERENCE,
+             targetElement: '_Notes'
+         }
+       ]
+       
+  @UI.lineItem: [{ position: 10 }]
+  @UI.selectionField: [{ position: 10 }]
+  PriceAuth;
+
+  @UI.selectionField: [{ element: '_Items.Material', position : 30 }]
+  _Items;
+  
+  @UI.lineItem: [{ position: 20 }]
+  @UI.selectionField: [{ position: 20 }]
+  @UI.identification: [ { type: #FOR_ACTION, label: 'Import File', dataAction: 'importFile' },
+                        { type: #FOR_ACTION, label: 'Export Data', dataAction: 'exportFile' },
+                        { type: #FOR_ACTION, label: 'Validate', dataAction: 'validateEntries' },
+                        { type: #FOR_ACTION, label: 'Submit',  dataAction: 'submit' }]
+  @UI.fieldGroup: [{ position: 10, qualifier: 'GeneralData' },
+                   { type: #FOR_ACTION, label: 'Import File', dataAction: 'importFile', qualifier: 'GeneralData' },
+                   { type: #FOR_ACTION, label: 'Export Data', dataAction: 'exportFile', qualifier: 'GeneralData' }]
+  Description;
+
+  @UI.fieldGroup: [{ position: 10, qualifier: 'Validity'}]
+  ValidFrom;
+
+  @UI.fieldGroup: [{ position: 20, qualifier: 'Validity'}]
+  ValidTo;
+
+  @UI.fieldGroup: [{ position: 11, qualifier: 'SalesArea'}]
+  Salesorg;
+
+  @UI.fieldGroup: [{ position: 12, qualifier: 'SalesArea'}]
+  Distchannel;
+
+  @UI.fieldGroup: [{ position: 13, qualifier: 'SalesArea'}]
+  Division;
+
+  @UI.lineItem: [{ position: 30 }]
+  Localcreatedat;
+
+  @UI.lineItem: [{ position: 40 }]
+  Localcreatedby;
+
+  @UI.lineItem: [{ position: 50 }]
+  @UI.fieldGroup: [{ position: 20, qualifier: 'GeneralData'}]
+  SubmittedTo;
+
+  @UI.fieldGroup: [{ position: 10, qualifier: 'FileProcessing'}]
+  AttachmentUpload;
+
+  @UI.fieldGroup: [{ position: 20, qualifier: 'FileProcessing'}]
+  AttachmentDownload;
+
+//  @UI.lineItem: [{ position: 10 }]
+//  @UI.selectionField: [{ position: 10 }]
+//  PriceAuth;
+//
+//  @UI.lineItem: [{ position: 20 }]
+//  @UI.identification: [ { position: 20 },
+//                      { type: #FOR_ACTION, label: 'Import File', dataAction: 'importFile' },
+//                      { type: #FOR_ACTION, label: 'Export Data', dataAction: 'exportFile' },
+//                      { type: #FOR_ACTION, label: 'Validate', dataAction: 'validateEntries' },
+//                      { type: #FOR_ACTION, label: 'Submit',  dataAction: 'submit' }]
+//  @UI.selectionField: [{ position: 20 }]
+//  Description;
+//
+//  @UI.selectionField: [{ element: '_Items.Material', position : 30 }]
+//  _Items;
+//
+//  @UI.identification: [{ position: 30 }]
+//  ValidFrom;
+//
+//  @UI.identification: [{ position: 40 }]
+//  ValidTo;
+//
+//  @UI.identification: [{ position: 50 }]
+//  Salesorg;
+//
+//  @UI.identification: [{ position: 60 }]
+//  Distchannel;
+//
+//  @UI.identification: [{ position: 70 }]
+//  Division;
+//
+//  @UI.lineItem: [{ position: 30 }]
+//  Localcreatedat;
+//
+//  @UI.lineItem: [{ position: 40 }]
+//  Localcreatedby;
+//
+//  @UI.lineItem: [{ position: 50 }]
+//  @UI.identification: [{ position: 80 }]
+//  SubmittedTo;
+//
+//  @UI.identification: [{ position: 90 }]
+//  AttachmentUpload;
+//
+//  @UI.identification: [{ position: 100 }]
+//  AttachmentDownload;
+
+}

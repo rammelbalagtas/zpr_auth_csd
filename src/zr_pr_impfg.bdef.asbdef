@@ -1,0 +1,48 @@
+managed implementation in class ZBP_R_PR_IMPFG unique;
+strict ( 2 );
+with draft;
+define behavior for ZR_PR_IMPFG alias ZrPrImpfg
+persistent table ZPR_IMPFG
+draft table ZPR_IMPFG_D
+etag master Locallastchangedat
+lock master total etag Lastchangedat
+authorization master( global )
+
+{
+  field ( mandatory : create )
+   Configmat,
+   Material;
+
+  field ( readonly )
+   Localcreatedby,
+   Localcreatedat,
+   Locallastchangedby,
+   Locallastchangedat,
+   Lastchangedat;
+
+  field ( readonly : update )
+   Configmat,
+   Material;
+
+
+  create;
+  update;
+  delete;
+
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Edit;
+  draft action Resume;
+  draft determine action Prepare;
+
+  mapping for ZPR_IMPFG
+  {
+    Configmat = configmat;
+    Material = material;
+    Localcreatedby = localcreatedby;
+    Localcreatedat = localcreatedat;
+    Locallastchangedby = locallastchangedby;
+    Locallastchangedat = locallastchangedat;
+    Lastchangedat = lastchangedat;
+  }
+}

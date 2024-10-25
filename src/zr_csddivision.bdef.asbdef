@@ -1,0 +1,46 @@
+managed implementation in class ZBP_R_CSDDIVISION unique;
+strict ( 2 );
+with draft;
+define behavior for ZR_CSDDIVISION alias ZrCsddivision
+persistent table ZCSDDIVISION
+draft table ZCSDDIVISION_D
+etag master Locallastchangedat
+lock master total etag Lastchangedat
+authorization master( global )
+
+{
+  field ( mandatory : create )
+   Division;
+
+  field ( readonly )
+   Localcreatedby,
+   Localcreatedat,
+   Locallastchangedby,
+   Locallastchangedat,
+   Lastchangedat;
+
+  field ( readonly : update )
+   Division;
+
+
+  create;
+  update;
+  delete;
+
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Edit;
+  draft action Resume;
+  draft determine action Prepare;
+
+  mapping for ZCSDDIVISION
+  {
+    Division = division;
+    Description = description;
+    Localcreatedby = localcreatedby;
+    Localcreatedat = localcreatedat;
+    Locallastchangedby = locallastchangedby;
+    Locallastchangedat = locallastchangedat;
+    Lastchangedat = lastchangedat;
+  }
+}

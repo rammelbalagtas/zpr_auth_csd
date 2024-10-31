@@ -13,11 +13,22 @@ define root view entity ZR_PR_AUTH2_HEAD
     ValidFrom,
     ValidTo,
     Status,
+    @Consumption.valueHelpDefinition: [{ entity: {name: 'ZPRAUTH_I_ACTIONVH' , element: 'Action' }, useForValidation: true,
+                   additionalBinding: [{ localElement: 'SubmittedBy', element: 'SubmittedBy', usage: #FILTER },
+                                       { localElement: 'Status', element: 'Status', usage: #FILTER }] }]
+    Action,
     Salesorg,
     Distchannel,
     @Consumption.valueHelpDefinition: [{ entity: {name: 'zcsd_division_stdvh' , element: 'Division' }, useForValidation: true }]
     Division,
+    @Consumption.valueHelpDefinition: [{ entity: {name: 'ZPRAUTH_I_SUBMITTOVH' , element: 'UserId' }, useForValidation: true,
+                   additionalBinding: [{ localElement: 'Division', element: 'Division', usage: #FILTER },
+                                       { localElement: 'SubmittedBy', element: 'SubmittedBy', usage: #FILTER },
+                                       { localElement: 'Status', element: 'Status', usage: #FILTER }] }]
+    SubmitTo,
     SubmittedTo,
+    @Consumption.valueHelpDefinition: [{ entity: { name: 'ZI_SUBMITTEDBY_VH', element: 'Description' }, useForValidation: true }]
+    SubmittedBy,
     Notify,
     AttachmentUpload,
     MimeTypeUpload,
@@ -25,6 +36,10 @@ define root view entity ZR_PR_AUTH2_HEAD
     AttachmentDownload,
     MimeTypeDownload,
     FilenameDownload,
+    Materialcount,
+    Impactedfgcount,
+    Notescount,
+    Messagescount,
     Localcreatedby,
     Localcreatedat,
     Locallastchangedby,

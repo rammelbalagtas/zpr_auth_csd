@@ -20,7 +20,7 @@ annotate entity ZC_PR_AUTH2_ITEM with
   GpZprCurr;
   @UI.lineItem: [{ position: 70 }]
   ZgoNew;
-  @UI.lineItem: [{ position: 80 }]
+  @UI.lineItem: [{ position: 80, criticality: 'Criticality', criticalityRepresentation: #WITHOUT_ICON }]
   ZgoCurr;
   @UI.lineItem: [{ position: 90 }]
   ZpxNew;

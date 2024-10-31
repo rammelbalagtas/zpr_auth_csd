@@ -4,6 +4,8 @@ CLASS lhc_items DEFINITION INHERITING FROM cl_abap_behavior_handler.
 
     METHODS onSelectMaterial FOR DETERMINE ON MODIFY
       IMPORTING keys FOR Items~onSelectMaterial.
+    METHODS get_instance_features FOR INSTANCE FEATURES
+      IMPORTING keys REQUEST requested_features FOR Items RESULT result.
 
 ENDCLASS.
 
@@ -13,6 +15,9 @@ CLASS lhc_items IMPLEMENTATION.
 
     DATA lr_material TYPE RANGE OF zmatnr.
     READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+        ENTITY Header
+        ALL FIELDS WITH CORRESPONDING #( keys )
+        RESULT DATA(lt_header)
         ENTITY Items
         ALL FIELDS WITH CORRESPONDING #( keys )
         RESULT DATA(lt_item).
@@ -31,6 +36,27 @@ CLASS lhc_items IMPLEMENTATION.
     ENDLOOP.
 
     IF lr_material IS NOT INITIAL.
+
+      READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+      ENTITY Header
+      BY \_Items
+      ALL FIELDS WITH
+      CORRESPONDING #( keys )
+      RESULT DATA(lt_all_items).
+
+      DATA(lv_count) = lines( lt_all_items ).
+      MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+               ENTITY Header
+                 UPDATE
+                   FIELDS ( Materialcount )
+                   WITH VALUE #( FOR header IN lt_header
+                                   ( %tky    = header-%tky
+                                     Materialcount = lv_count
+                                      ) )
+               MAPPED DATA(upd_mapped)
+               FAILED DATA(upd_failed)
+               REPORTED DATA(upd_reported).
+
       MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
          ENTITY Items
            UPDATE
@@ -50,7 +76,8 @@ CLASS lhc_items IMPLEMENTATION.
                         Zpr12Curr
                         Zpr13Curr
                         Zpr14Curr
-                        Zpr15Curr )
+                        Zpr15Curr
+                        Criticality )
              WITH VALUE #( FOR item IN lt_item
                              ( %tky    = item-%tky
                                Zp1Curr = item-Zp1Curr
@@ -70,10 +97,11 @@ CLASS lhc_items IMPLEMENTATION.
                                Zpr13Curr = item-Zpr13Curr
                                Zpr14Curr = item-Zpr14Curr
                                Zpr15Curr = item-Zpr15Curr
+                               Criticality = '3'
                               ) )
-         MAPPED DATA(upd_mapped)
-         FAILED DATA(upd_failed)
-         REPORTED DATA(upd_reported).
+         MAPPED upd_mapped
+         FAILED upd_failed
+         REPORTED upd_reported.
 
 *      SELECT * FROM zpr_impfg WHERE material IN @lr_material INTO TABLE @DATA(lt_config).
 *      IF sy-subrc EQ 0.
@@ -125,6 +153,29 @@ CLASS lhc_items IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
+  METHOD get_instance_features.
+    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    ENTITY Header
+      FIELDS ( Status )
+      WITH CORRESPONDING #(  keys  )
+    RESULT DATA(lt_header)
+    ENTITY Items
+    ALL FIELDS WITH CORRESPONDING #(  keys  )
+    RESULT DATA(lt_items).
+
+    READ TABLE lt_header INTO DATA(ls_header) INDEX 1.
+
+    result = VALUE #( FOR item IN lt_items
+                        ( %tky      = item-%tky
+                          %update  = COND #( WHEN ls_header-status = 'New' OR ls_header-status = 'Draft' OR ls_header-status = 'Rejected'
+                                                     THEN if_abap_behv=>fc-o-enabled
+                                                     ELSE if_abap_behv=>fc-o-disabled  )
+                          %delete  = COND #( WHEN ls_header-status = 'New' OR ls_header-status = 'Draft' OR ls_header-status = 'Rejected'
+                                                     THEN if_abap_behv=>fc-o-enabled
+                                                     ELSE if_abap_behv=>fc-o-disabled  )
+                                                      ) ).
+  ENDMETHOD.
+
 ENDCLASS.
 
 CLASS lhc_Header DEFINITION INHERITING FROM cl_abap_behavior_handler.
@@ -145,6 +196,12 @@ CLASS lhc_Header DEFINITION INHERITING FROM cl_abap_behavior_handler.
       IMPORTING keys FOR ACTION header~validateentries.
     METHODS setdefaultvalues FOR DETERMINE ON MODIFY
       IMPORTING keys FOR header~setdefaultvalues.
+*    METHODS get_instance_features FOR INSTANCE FEATURES
+*      IMPORTING keys REQUEST requested_features FOR header RESULT result.
+    METHODS onsave FOR DETERMINE ON SAVE
+      IMPORTING keys FOR header~onsave.
+    METHODS get_instance_features FOR INSTANCE FEATURES
+      IMPORTING keys REQUEST requested_features FOR header RESULT result.
 
     METHODS earlynumbering_create FOR NUMBERING
       IMPORTING entities FOR CREATE Header.
@@ -473,6 +530,44 @@ CLASS lhc_Header IMPLEMENTATION.
                     ) TO reported-header.
     ENDIF.
 
+    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    ENTITY Header
+    BY \_Items
+    ALL FIELDS WITH
+    CORRESPONDING #( keys )
+    RESULT DATA(lt_all_items)
+    BY \_ImpactedGoods
+    ALL FIELDS WITH
+    CORRESPONDING #( keys )
+    RESULT DATA(lt_all_impactedfg)
+    BY \_Notes
+    ALL FIELDS WITH
+    CORRESPONDING #( keys )
+    RESULT DATA(lt_all_notes)
+    BY \_Messages
+    ALL FIELDS WITH
+    CORRESPONDING #( keys )
+    RESULT DATA(lt_all_messages).
+
+    DATA(lv_material_count) = lines( lt_all_items ).
+    DATA(lv_impactfg_count) = lines( lt_all_impactedfg ).
+    DATA(lv_notes_count) = lines( lt_all_notes ).
+    DATA(lv_messages_count) = lines( lt_all_messages ).
+
+    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+             ENTITY Header
+               UPDATE
+                 FIELDS ( Materialcount Impactedfgcount Notescount Messagescount )
+                 WITH VALUE #( FOR header IN lt_header
+                                 ( %tky    = header-%tky
+                                   Materialcount = lv_material_count
+                                   Impactedfgcount = lv_impactfg_count
+                                   Notescount = lv_notes_count
+                                   Messagescount = lv_messages_count ) )
+    MAPPED DATA(upd_mapped)
+    FAILED DATA(upd_failed)
+    REPORTED DATA(upd_reported).
+
     result = VALUE #( FOR header IN lt_header
                           ( %tky   = header-%tky
                             %param = header ) ).
@@ -483,6 +578,57 @@ CLASS lhc_Header IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD submit.
+
+    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+     ENTITY Header
+       UPDATE
+         FIELDS ( Status )
+        WITH VALUE #( FOR key IN keys
+                         ( %tky   = key-%tky
+                           Status = 'Submitted for Category Manager Approval' ) ).
+
+* Check if there are any draft instances?
+    DATA(lt_draft_docs) = keys.
+    DELETE lt_draft_docs WHERE %is_draft = if_abap_behv=>mk-off.
+
+    IF lt_draft_docs IS NOT INITIAL.
+
+      MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+       ENTITY Header
+         EXECUTE Activate FROM
+         VALUE #( FOR key IN keys ( %key = key-%key ) )
+       MAPPED DATA(activate_mapped)
+       FAILED DATA(activate_failed)
+       REPORTED DATA(activate_reported).
+
+    ENDIF.
+
+    DATA(lt_keys) = keys.
+    LOOP AT lt_keys ASSIGNING FIELD-SYMBOL(<fs_key>).
+      <fs_key>-%is_draft = if_abap_behv=>mk-off.
+    ENDLOOP.
+
+    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+        ENTITY Header
+        ALL FIELDS WITH
+        CORRESPONDING #( lt_keys )
+        RESULT DATA(lt_header).
+
+    result = VALUE #( FOR new_key IN lt_keys
+                          ( %key   = keys[ 1 ]-%key
+                            %tky   = keys[ 1 ]-%tky
+                            %param-%key = new_key-%key ) ).
+
+* Populate %key , %tky  to be filled from source instance while %param-%key to be filled from new instance.
+*    result = VALUE #( for <fs_old_key> in keys
+*                      for <fs_new_key> IN lt_keys WHERE ( Priceauth = <Fs_old_key>-Priceauth )
+*                                                        ( %key = <fs_old_key>-%key
+*                                                          %tky = <fs_old_key>-%tky
+*                                                          %param-%key = <fs_new_key>-%key ) ).
+
+
+    mapped-header = CORRESPONDING #( lt_header ).
+
   ENDMETHOD.
 
   METHOD validateEntries.
@@ -493,21 +639,21 @@ CLASS lhc_Header IMPLEMENTATION.
          CORRESPONDING #( keys )
          RESULT DATA(lt_header).
 
-*    LOOP AT lt_header INTO DATA(ls_header).
-*      APPEND VALUE #(  %tky        = ls_header-%tky
-*                       %state_area = 'VALIDATE_ONSAVE'
-*                    ) TO reported-header.
-*
-*      IF ls_header-description IS INITIAL.
-*        APPEND VALUE #( %tky = ls_header-%tky ) TO failed-header.
-*        APPEND VALUE #( %tky = ls_header-%tky
-*                        %state_area         = 'VALIDATE_ONSAVE'
-*                        %msg = new_message_with_text( severity = if_abap_behv_message=>severity-error
-*                                                          text = 'Fill up mandatory fields' )
-*
-*                        %element-Description   = if_abap_behv=>mk-on
-*                       ) TO reported-header.
-*      ENDIF.
+    LOOP AT lt_header INTO DATA(ls_header).
+      APPEND VALUE #(  %tky        = ls_header-%tky
+                       %state_area = 'VALIDATE_ONSAVE'
+                    ) TO reported-header.
+
+      IF ls_header-description IS INITIAL.
+        APPEND VALUE #( %tky = ls_header-%tky ) TO failed-header.
+        APPEND VALUE #( %tky = ls_header-%tky
+                        %state_area         = 'VALIDATE_ONSAVE'
+                        %msg = new_message_with_text( severity = if_abap_behv_message=>severity-error
+                                                          text = 'Fill up mandatory fields' )
+
+                        %element-Description   = if_abap_behv=>mk-on
+                       ) TO reported-header.
+      ENDIF.
 *
 *      IF ls_header-validfrom IS INITIAL.
 *        APPEND VALUE #( %tky = ls_header-%tky ) TO failed-header.
@@ -552,7 +698,7 @@ CLASS lhc_Header IMPLEMENTATION.
 *                        %element-division   = if_abap_behv=>mk-on
 *                       ) TO reported-header.
 *      ENDIF.
-*    ENDLOOP.
+    ENDLOOP.
 
     READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
     ENTITY Header
@@ -609,37 +755,148 @@ CLASS lhc_Header IMPLEMENTATION.
     FAILED DATA(lt_item_failed).
 
     IF failed-header IS INITIAL.
-*      APPEND VALUE #( %msg = new_message_with_text( severity = if_abap_behv_message=>severity-information
-*                                                        text = 'Data has been validated. No errors found.' )
-*                    ) TO reported-header.
       APPEND VALUE #( %msg = new_message( severity = if_abap_behv_message=>severity-information
                                           id = 'ZPRAUTHCSD'
-                                          number = '001' )
+                                          number = '001' ) "'Data has been validated. No errors found.'
                     ) TO reported-header.
 
     ENDIF.
+
+    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    ENTITY Header
+    BY \_Items
+    ALL FIELDS WITH
+    CORRESPONDING #( keys )
+    RESULT DATA(lt_all_items)
+    BY \_ImpactedGoods
+    ALL FIELDS WITH
+    CORRESPONDING #( keys )
+    RESULT DATA(lt_all_impactedfg)
+    BY \_Notes
+    ALL FIELDS WITH
+    CORRESPONDING #( keys )
+    RESULT DATA(lt_all_notes)
+    BY \_Messages
+    ALL FIELDS WITH
+    CORRESPONDING #( keys )
+    RESULT DATA(lt_all_messages).
+
+    DATA(lv_material_count) = lines( lt_all_items ).
+    DATA(lv_impactfg_count) = lines( lt_all_impactedfg ).
+    DATA(lv_notes_count) = lines( lt_all_notes ).
+    DATA(lv_messages_count) = lines( lt_all_messages ).
+
+    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+             ENTITY Header
+               UPDATE
+                 FIELDS ( Materialcount Impactedfgcount Notescount Messagescount )
+                 WITH VALUE #( FOR header IN lt_header
+                                 ( %tky    = header-%tky
+                                   Materialcount = lv_material_count
+                                   Impactedfgcount = lv_impactfg_count
+                                   Notescount = lv_notes_count
+                                   Messagescount = lv_messages_count ) )
+    MAPPED DATA(upd_mapped)
+    FAILED DATA(upd_failed)
+    REPORTED DATA(upd_reported).
 
   ENDMETHOD.
 
   METHOD setDefaultValues.
     READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
     ENTITY Header
-       FIELDS ( SalesOrg DistChannel )
+       FIELDS ( Status SalesOrg DistChannel )
     WITH CORRESPONDING #( keys )
     RESULT DATA(lt_header).
     MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
      ENTITY Header
        UPDATE
-         FIELDS ( SalesOrg DistChannel )
+         FIELDS ( Status SalesOrg DistChannel )
         WITH VALUE #( FOR header IN lt_header
                          ( %tky             = header-%tky
                            SalesOrg         = 'PCI'
                            DistChannel      = '04'
+                           Status           = 'New'
                            %control-SalesOrg  = if_abap_behv=>mk-on
+                           %control-Status  = if_abap_behv=>mk-on
                            %control-DistChannel  = if_abap_behv=>mk-on ) )
      FAILED DATA(upd_failed)
      REPORTED DATA(upd_reported).
     reported = CORRESPONDING #( DEEP upd_reported ).
+  ENDMETHOD.
+
+  METHOD onSave.
+    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    ENTITY Header
+       FIELDS ( Action Status )
+    WITH CORRESPONDING #( keys )
+    RESULT DATA(lt_header).
+    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+     ENTITY Header
+       UPDATE
+         FIELDS ( Status SubmittedTo )
+        WITH VALUE #( FOR header IN lt_header
+                         ( %tky             = header-%tky
+                           Status           = COND #( WHEN header-Action = ' ' AND header-Status = 'New'
+                                                      THEN 'Draft'
+                                                      WHEN header-Action = ' ' AND header-Status = 'Draft'
+                                                      THEN 'Draft'
+                                                      WHEN header-Action = 'Submit to Category Manager'
+                                                      THEN 'Submitted to Category Manager for Approval'
+                                                      WHEN header-Action = 'Approved by Category Manager' AND header-status = 'Submitted to Category Manager for Approval'
+                                                      THEN 'Approved by Category Manager'
+                                                      WHEN header-Action = 'Rejected by Category Manager' AND header-status = 'Submitted to Category Manager for Approval'
+                                                      THEN 'Rejected by Category Manager'
+                                                      WHEN header-Action = 'Approved by Accounting' AND header-status = 'Approved by Category Manager'
+                                                      THEN 'Posted'
+                                                      WHEN header-Action = 'Rejected by Accounting' AND header-status = 'Approved by Category Manager'
+                                                      THEN 'Rejected by Accounting' )
+                          SubmittedTo      =  header-SubmitTo  ) )
+     FAILED DATA(upd_failed)
+     REPORTED DATA(upd_reported).
+    reported = CORRESPONDING #( DEEP upd_reported ).
+  ENDMETHOD.
+
+  METHOD get_instance_features.
+    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+      ENTITY Header
+        FIELDS ( Status )
+        WITH CORRESPONDING #(  keys  )
+      RESULT DATA(lt_header).
+
+    result = VALUE #( FOR header IN lt_header
+                        ( %tky      = header-%tky
+                          %field-Division  = COND #( WHEN header-status = 'New' OR header-status = 'Draft' OR header-status = 'Rejected'
+                                                     THEN if_abap_behv=>fc-f-unrestricted
+                                                     ELSE if_abap_behv=>fc-f-read_only  )
+                          %field-Description  = COND #( WHEN header-status = 'New' OR header-status = 'Draft' OR header-status = 'Rejected'
+                                                     THEN if_abap_behv=>fc-f-unrestricted
+                                                     ELSE if_abap_behv=>fc-f-read_only  )
+                          %field-ValidFrom  = COND #( WHEN header-status = 'New' OR header-status = 'Draft' OR header-status = 'Rejected'
+                                                     THEN if_abap_behv=>fc-f-unrestricted
+                                                     ELSE if_abap_behv=>fc-f-read_only  )
+                          %field-ValidTo  = COND #( WHEN header-status = 'New' OR header-status = 'Draft' OR header-status = 'Rejected'
+                                                     THEN if_abap_behv=>fc-f-unrestricted
+                                                     ELSE if_abap_behv=>fc-f-read_only  )
+                          %field-SubmittedBy  = COND #( WHEN header-status = 'New' OR header-status = 'Draft' OR header-status = 'Rejected'
+                                                     THEN if_abap_behv=>fc-f-unrestricted
+                                                     ELSE if_abap_behv=>fc-f-read_only  )
+                          %action-validateEntries  = COND #( WHEN header-status = 'New' OR header-status = 'Draft' OR header-status = 'Rejected'
+                                                     THEN if_abap_behv=>fc-o-enabled
+                                                     ELSE if_abap_behv=>fc-o-disabled  )
+                          %action-importFile  = COND #( WHEN header-status = 'New' OR header-status = 'Draft' OR header-status = 'Rejected'
+                                                     THEN if_abap_behv=>fc-o-enabled
+                                                     ELSE if_abap_behv=>fc-o-disabled  )
+                          %assoc-_Items  = COND #( WHEN header-status = 'New' OR header-status = 'Draft' OR header-status = 'Rejected'
+                                                     THEN if_abap_behv=>fc-o-enabled
+                                                     ELSE if_abap_behv=>fc-o-disabled  )
+                          %assoc-_Notes  = COND #( WHEN header-status = 'Posted'
+                                                     THEN if_abap_behv=>fc-o-disabled
+                                                     ELSE if_abap_behv=>fc-o-enabled  )
+                          %update  = COND #( WHEN header-status = 'Posted'
+                                                     THEN if_abap_behv=>fc-o-disabled
+                                                     ELSE if_abap_behv=>fc-o-enabled  )
+                         ) ).
   ENDMETHOD.
 
 ENDCLASS.

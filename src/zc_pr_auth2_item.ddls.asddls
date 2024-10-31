@@ -50,6 +50,7 @@ define view entity ZC_PR_AUTH2_ITEM
       Zpr14New,
       Zpr15Curr,
       Zpr15New,
+      Criticality,
       Localcreatedby,
       Localcreatedat,
       Locallastchangedby,

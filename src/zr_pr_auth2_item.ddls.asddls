@@ -6,10 +6,11 @@ define view entity ZR_PR_AUTH2_ITEM
 //  association [1]    to zi_pr_csd_mat  as _Material on  $projection.Material = _Material.Material
 {
   key PriceAuth,
-    @Consumption.valueHelpDefinition: [{ entity: {name: 'zi_pr_csd_mat_stdvh' , element: 'Material' }, useForValidation: true,
+    @Consumption.valueHelpDefinition: [{ entity: {name: 'ZI_PR_CSD_MAT_STDVH' , element: 'Material' }, useForValidation: true,
                    additionalBinding: [{ localElement: '_Header.Salesorg', element: 'Salesorg', usage: #FILTER },
                                        { localElement: '_Header.Distchannel', element: 'Distchannel', usage: #FILTER },
                                        { localElement: '_Header.Division', element: 'Division', usage: #FILTER }] }]
+//    @Consumption.valueHelpDefinition: [{ entity: {name: 'ZI_PR_CSD_MAT_STDVH' , element: 'Material' }, useForValidation: true } ]
   key Material,
       Sequence,
       ItemType,
@@ -55,6 +56,7 @@ define view entity ZR_PR_AUTH2_ITEM
       Zpr14New,
       Zpr15Curr,
       Zpr15New,
+      Criticality,
       Localcreatedby,
       Localcreatedat,
       Locallastchangedby,

@@ -90,6 +90,7 @@ define view entity ZI_PR_AUTH2_ITEM
       zpr15_curr         as Zpr15Curr,
       @EndUserText.label : 'ZPR15 (New)'
       zpr15_new          as Zpr15New,
+      criticality        as Criticality,
       @Semantics.user.createdBy: true
       localcreatedby     as Localcreatedby,
       @Semantics.systemDateTime.createdAt: true

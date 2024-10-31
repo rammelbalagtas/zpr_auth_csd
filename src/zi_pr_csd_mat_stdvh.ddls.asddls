@@ -6,13 +6,13 @@ define view entity zi_pr_csd_mat_stdvh
   as select from zi_pr_csd_mat
 {
       @UI.lineItem : [{ exclude: true} ]
-      @UI.selectionField: [{exclude: true}]
+//      @UI.selectionField: [{exclude: true}]
   key Salesorg,
       @UI.lineItem : [{ exclude: true} ]
-      @UI.selectionField: [{exclude: true}]
+//      @UI.selectionField: [{exclude: true}]
   key Distchannel,
       @UI.lineItem : [{ exclude: true} ]
-      @UI.selectionField: [{exclude: true}]
+//      @UI.selectionField: [{exclude: true}]
   key Division,
       @Search.defaultSearchElement: true
       @ObjectModel.text.element: ['Description']

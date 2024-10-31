@@ -11,16 +11,19 @@ early numbering
 authorization master ( instance )
 {
   create;
-  update;
+  update ( features : instance );
   delete;
   field ( readonly ) PriceAuth, SalesOrg, DistChannel, AttachmentDownload;
-  field ( mandatory ) Description, ValidFrom, ValidTo, SubmittedTo, Division;
-  association _Items { create; with draft; }
+  field ( features : instance ) Description, ValidFrom, ValidTo, SubmittedBy, Division;
+  field ( mandatory ) Description, ValidFrom, ValidTo, SubmitTo, Division;
+  association _Items  { create ( features : instance ); with draft ; }
   association _ImpactedGoods { internal create; with draft; }
   association _Messages { internal create; with draft; }
-  association _Notes { create; with draft; }
+  association _Notes { create ( features : instance ); with draft; }
 
   determination setDefaultValues on modify { create; }
+  determination onSave on save { field Action; }
+  //  determination onSave on save { create; update; }
 
   draft action Edit;
   draft action Activate optimized;
@@ -28,9 +31,9 @@ authorization master ( instance )
   draft action Resume;
   draft determine action Prepare;
 
-  action importFile result [1] $self;
+  action ( features : instance ) importFile result [1] $self;
   action exportFile result [1] $self;
-  action validateEntries;
+  action ( features : instance ) validateEntries;
   action submit result [1] entity ZR_PR_AUTH2_HEAD;
 
   side effects
@@ -38,7 +41,7 @@ authorization master ( instance )
     action exportFile affects $self;
     action importFile affects entity _Items, entity _ImpactedGoods;
     action submit affects $self;
-    action validateEntries affects entity _ImpactedGoods;
+    action validateEntries affects field Materialcount, field Impactedfgcount, field Notescount, field Messagescount, entity _ImpactedGoods;
   }
 
   mapping for zpr_auth2_head
@@ -49,10 +52,13 @@ authorization master ( instance )
       ValidFrom          = valid_from;
       ValidTo            = valid_to;
       status             = status;
+      action             = action;
       SalesOrg           = SalesOrg;
       DistChannel        = DistChannel;
       Division           = Division;
-      submittedto        = submitted_to;
+      SubmitTo           = submit_to;
+      SubmittedTo        = submitted_to;
+      SubmittedBy        = submitted_by;
       notify             = notify;
       attachmentupload   = attachment_u;
       mimetypeUpload     = mimetype_u;
@@ -60,6 +66,10 @@ authorization master ( instance )
       attachmentDownload = attachment_d;
       mimetypeDownload   = mimetype_d;
       filenameDownload   = filename_d;
+      Materialcount      = materialcount;
+      Impactedfgcount    = impactedfgcount;
+      Notescount         = notescount;
+      Messagescount      = messagescount;
       LocalCreatedBy     = localcreatedby;
       LocalCreatedAt     = localcreatedat;
       LocalLastChangedBy = locallastchangedby;
@@ -75,8 +85,8 @@ lock dependent by _Header
 authorization dependent by _Header
 etag master LocalLastChangedAt
 {
-  update;
-  delete;
+  update ( features : instance );
+  delete ( features : instance );
   field ( readonly ) Map, PriceAuth, GpZpxCurr, GpZpxNew, GpZprCurr, GpZprNew, Zp1Curr, ZgoCurr, ZpxCurr,
   Zpr02Curr, Zpr03Curr, Zpr04Curr, Zpr05Curr, Zpr06Curr, Zpr07Curr, Zpr08Curr, Zpr09Curr, Zpr10Curr, Zpr11Curr, Zpr12Curr, Zpr13Curr, Zpr14Curr, Zpr15Curr;
   field ( readonly : update ) Material;
@@ -133,6 +143,7 @@ etag master LocalLastChangedAt
       Zpr14New           = Zpr14_New;
       Zpr15Curr          = Zpr15_Curr;
       Zpr15New           = Zpr15_New;
+      Criticality        = Criticality;
       LocalCreatedBy     = localcreatedby;
       Localcreatedat     = Localcreatedat;
       Locallastchangedby = Locallastchangedby;

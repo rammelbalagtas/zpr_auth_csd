@@ -22,8 +22,8 @@ authorization master ( instance )
   association _Notes { create ( features : instance ); with draft; }
 
   determination setDefaultValues on modify { create; }
-  determination onSave on save { field Action; }
-  //  determination onSave on save { create; update; }
+  determination onSave on save { field Action; field Description; }
+//    determination onSave on save { create; update; }
 
   draft action Edit;
   draft action Activate optimized;
@@ -40,7 +40,6 @@ authorization master ( instance )
   {
     action exportFile affects $self;
     action importFile affects entity _Items, entity _ImpactedGoods;
-    action submit affects $self;
     action validateEntries affects field Materialcount, field Impactedfgcount, field Notescount, field Messagescount, entity _ImpactedGoods;
   }
 

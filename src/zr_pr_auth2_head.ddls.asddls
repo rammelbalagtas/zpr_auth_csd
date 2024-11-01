@@ -24,6 +24,7 @@ define root view entity ZR_PR_AUTH2_HEAD
     @Consumption.valueHelpDefinition: [{ entity: {name: 'ZPRAUTH_I_SUBMITTOVH' , element: 'UserId' }, useForValidation: true,
                    additionalBinding: [{ localElement: 'Division', element: 'Division', usage: #FILTER },
                                        { localElement: 'SubmittedBy', element: 'SubmittedBy', usage: #FILTER },
+                                       { localElement: 'SubmittedTo', element: 'SubmittedTo', usage: #FILTER },
                                        { localElement: 'Status', element: 'Status', usage: #FILTER }] }]
     SubmitTo,
     SubmittedTo,

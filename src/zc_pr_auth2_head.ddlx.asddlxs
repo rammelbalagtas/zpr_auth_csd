@@ -271,18 +271,18 @@ annotate entity ZC_PR_AUTH2_HEAD with
                  { position: 30, qualifier: 'Posted' }]
   Localcreatedat;
 
-  @UI.lineItem: [{ position: 40, qualifier: 'Query' }, 
-                 { position: 40, qualifier: 'Draft' }, 
-                 { position: 40, qualifier: 'CategoryManager' },
-                 { position: 40, qualifier: 'Accounting' },
-                 { position: 40, qualifier: 'Posted' }]
-  Localcreatedby;
+//  @UI.lineItem: [{ position: 40, qualifier: 'Query' }, 
+//                 { position: 40, qualifier: 'Draft' }, 
+//                 { position: 40, qualifier: 'CategoryManager' },
+//                 { position: 40, qualifier: 'Accounting' },
+//                 { position: 40, qualifier: 'Posted' }]
+//  Localcreatedby;
 
-  @UI.lineItem: [{ position: 50, qualifier: 'Query' }, 
-                 { position: 50, qualifier: 'Draft' }, 
-                 { position: 50, qualifier: 'CategoryManager' },
-                 { position: 50, qualifier: 'Accounting' },
-                 { position: 50, qualifier: 'Posted' }]
+  @UI.lineItem: [{ position: 50, qualifier: 'Query', importance: #HIGH }, 
+                 { position: 50, qualifier: 'Draft', importance: #HIGH }, 
+                 { position: 50, qualifier: 'CategoryManager', importance: #HIGH }, 
+                 { position: 50, qualifier: 'Accounting', importance: #HIGH }, 
+                 { position: 50, qualifier: 'Posted', importance: #HIGH }]
 //  @UI.fieldGroup: [{ position: 30, qualifier: 'GeneralData'}]
   Status;
   

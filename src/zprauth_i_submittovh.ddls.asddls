@@ -16,5 +16,7 @@ define custom entity ZPRAUTH_I_SUBMITTOVH
       @UI.lineItem : [{ exclude: true} ]
       SubmittedBy : abap.char(50);
       @UI.lineItem : [{ exclude: true} ]
+      SubmittedTo : abap.char(50);
+      @UI.lineItem : [{ exclude: true} ]
       Status   : abap.char(50);
 }

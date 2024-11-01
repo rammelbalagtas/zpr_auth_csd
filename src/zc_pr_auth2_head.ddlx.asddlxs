@@ -123,37 +123,37 @@ annotate entity ZC_PR_AUTH2_HEAD with
       targetQualifier: 'HeaderData'
     },
 
-    //Datapoint for number of materials
-    {
-      purpose: #HEADER,
-      position   : 10,
-      type: #DATAPOINT_REFERENCE,
-      targetQualifier: 'datapoint_material'
-    },
-
-    //Datapoint for number of impacted goods
-    {
-      purpose: #HEADER,
-      position   : 20,
-      type: #DATAPOINT_REFERENCE,
-      targetQualifier: 'datapoint_impactedfg'
-    },
-
-     //Datapoint for number of notes
-    {
-      purpose: #HEADER,
-      position   : 30,
-      type: #DATAPOINT_REFERENCE,
-      targetQualifier: 'datapoint_notes'
-    },
-
-     //Datapoint for number of messages
-    {
-      purpose: #HEADER,
-      position   : 40,
-      type: #DATAPOINT_REFERENCE,
-      targetQualifier: 'datapoint_messages'
-    },
+//    //Datapoint for number of materials
+//    {
+//      purpose: #HEADER,
+//      position   : 10,
+//      type: #DATAPOINT_REFERENCE,
+//      targetQualifier: 'datapoint_material'
+//    },
+//
+//    //Datapoint for number of impacted goods
+//    {
+//      purpose: #HEADER,
+//      position   : 20,
+//      type: #DATAPOINT_REFERENCE,
+//      targetQualifier: 'datapoint_impactedfg'
+//    },
+//
+//     //Datapoint for number of notes
+//    {
+//      purpose: #HEADER,
+//      position   : 30,
+//      type: #DATAPOINT_REFERENCE,
+//      targetQualifier: 'datapoint_notes'
+//    },
+//
+//     //Datapoint for number of messages
+//    {
+//      purpose: #HEADER,
+//      position   : 40,
+//      type: #DATAPOINT_REFERENCE,
+//      targetQualifier: 'datapoint_messages'
+//    },
 
        //Content
        {
@@ -285,9 +285,6 @@ annotate entity ZC_PR_AUTH2_HEAD with
                  { position: 50, qualifier: 'Posted', importance: #HIGH }]
 //  @UI.fieldGroup: [{ position: 30, qualifier: 'GeneralData'}]
   Status;
-  
-  @UI.fieldGroup: [{ position: 31, qualifier: 'GeneralData', label: 'Choose an action'}]
-  Action;
 
   @UI.lineItem: [{ hidden: true, qualifier: 'Query' }, 
                  { hidden: true, qualifier: 'Draft' }, 
@@ -296,10 +293,10 @@ annotate entity ZC_PR_AUTH2_HEAD with
                  { hidden: true, qualifier: 'Posted' }]
   @UI.selectionField: [{exclude: true}]
   @UI.fieldGroup: [{ position: 10, qualifier: 'HeaderData'}]
-  @UI.dataPoint: {
-      qualifier: 'datapoint_material',
-      title: 'Materials'
-  }
+//  @UI.dataPoint: {
+//      qualifier: 'datapoint_material',
+//      title: 'Materials'
+//  }
   Materialcount;
 
   @UI.lineItem: [{ hidden: true, qualifier: 'Query' }, 
@@ -309,10 +306,10 @@ annotate entity ZC_PR_AUTH2_HEAD with
                  { hidden: true, qualifier: 'Posted' }]
   @UI.selectionField: [{exclude: true}]
   @UI.fieldGroup: [{ position: 20, qualifier: 'HeaderData'}]
-  @UI.dataPoint: {
-      qualifier: 'datapoint_impactedfg',
-      title: 'Impacted Finished Goods'
-  }
+//  @UI.dataPoint: {
+//      qualifier: 'datapoint_impactedfg',
+//      title: 'Impacted Finished Goods'
+//  }
   Impactedfgcount;
 
   @UI.lineItem: [{ hidden: true, qualifier: 'Query' }, 
@@ -322,10 +319,10 @@ annotate entity ZC_PR_AUTH2_HEAD with
                  { hidden: true, qualifier: 'Posted' }]
   @UI.selectionField: [{exclude: true}]
   @UI.fieldGroup: [{ position: 30, qualifier: 'HeaderData'}]
-  @UI.dataPoint: {
-      qualifier: 'datapoint_notes',
-      title: 'Notes'
-  }
+//  @UI.dataPoint: {
+//      qualifier: 'datapoint_notes',
+//      title: 'Notes'
+//  }
   Notescount;
 
   @UI.lineItem: [{ hidden: true, qualifier: 'Query' }, 
@@ -335,10 +332,10 @@ annotate entity ZC_PR_AUTH2_HEAD with
                  { hidden: true, qualifier: 'Posted' }]
   @UI.selectionField: [{exclude: true}]
   @UI.fieldGroup: [{ position: 40, qualifier: 'HeaderData'}]
-  @UI.dataPoint: {
-      qualifier: 'datapoint_messages',
-      title: 'Messages'
-  }
+//  @UI.dataPoint: {
+//      qualifier: 'datapoint_messages',
+//      title: 'Messages'
+//  }
   Messagescount;
 
   @UI.lineItem: [{ position: 60, qualifier: 'Query', importance: #HIGH }, 
@@ -349,7 +346,10 @@ annotate entity ZC_PR_AUTH2_HEAD with
   @UI.fieldGroup: [{ position: 20, qualifier: 'GeneralData'}]
   SubmittedBy;
   
-  @UI.fieldGroup: [{ position: 21, qualifier: 'GeneralData'}]
+  @UI.fieldGroup: [{ position: 21, qualifier: 'GeneralData', label: 'Choose an action'}]
+  Action;
+  
+  @UI.fieldGroup: [{ position: 31, qualifier: 'GeneralData'}]
   SubmitTo;
   
   @UI.lineItem: [{ position: 70, qualifier: 'Query', importance: #HIGH }, 

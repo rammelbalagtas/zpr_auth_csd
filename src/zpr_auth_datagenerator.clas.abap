@@ -48,7 +48,7 @@ CLASS zpr_auth_datagenerator IMPLEMENTATION.
                          ( Status = 'Rejected' Action = 'Submit to Category Manager' )
                          ( Status = 'Submitted to Category Manager for Approval' Action = 'Approved by Category Manager' )
                          ( Status = 'Submitted to Category Manager for Approval' Action = 'Rejected by Category Manager' )
-                         ( Status = 'Approved by Category Manager' Action = 'Approved by Accounting' )
+                         ( Status = 'Approved by Category Manager' Action = 'Approved and Posted by Accounting' )
                          ( Status = 'Approved by Category Manager' Action = 'Rejected by Accounting' ) ).
     INSERT zprauthaction FROM TABLE @lt_action.
   ENDMETHOD.

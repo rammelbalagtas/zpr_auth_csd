@@ -847,7 +847,7 @@ CLASS lhc_Header IMPLEMENTATION.
                                                       THEN 'Approved by Category Manager'
                                                       WHEN header-Action = 'Rejected by Category Manager' AND header-status = 'Submitted to Category Manager for Approval'
                                                       THEN 'Rejected by Category Manager'
-                                                      WHEN header-Action = 'Approved by Accounting' AND header-status = 'Approved by Category Manager'
+                                                      WHEN header-Action = 'Approved and Posted by Accounting' AND header-status = 'Approved by Category Manager'
                                                       THEN 'Posted'
                                                       WHEN header-Action = 'Rejected by Accounting' AND header-status = 'Approved by Category Manager'
                                                       THEN 'Rejected by Accounting' )

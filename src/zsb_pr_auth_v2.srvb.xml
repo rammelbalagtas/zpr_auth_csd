@@ -4,30 +4,30 @@
   <asx:values>
    <SRVB>
     <METADATA>
-     <NAME>ZUI_CSDDIVISION_O4</NAME>
+     <NAME>ZSB_PR_AUTH_V2</NAME>
      <TYPE>SRVB/SVB</TYPE>
-     <DESCRIPTION>Service Binding for ZUI_CSDDIVISION_O4</DESCRIPTION>
+     <DESCRIPTION>Price Authorization</DESCRIPTION>
      <LANGUAGE>EN</LANGUAGE>
      <MASTER_LANGUAGE>EN</MASTER_LANGUAGE>
      <ABAP_LANGU_VERSION>5</ABAP_LANGU_VERSION>
     </METADATA>
     <CONTENT>
      <BIND_TYPE_IMPL>
-      <NAME>ZUI_CSDDIVISION_O4</NAME>
+      <NAME>ZSB_PR_AUTH_V2</NAME>
      </BIND_TYPE_IMPL>
      <BIND_TYPE>ODATA</BIND_TYPE>
-     <BIND_TYPE_VERSION>V4</BIND_TYPE_VERSION>
+     <BIND_TYPE_VERSION>V2</BIND_TYPE_VERSION>
      <SERVICES>
       <item>
-       <SERVICE_NAME>ZUI_CSDDIVISION_O4</SERVICE_NAME>
+       <SERVICE_NAME>ZSB_PR_AUTH_V2</SERVICE_NAME>
        <SERVICE_CONTENT>
         <item>
          <SERVICE_VERSION>0001</SERVICE_VERSION>
          <RELEASE_STATE>NOT_RELEASED</RELEASE_STATE>
          <SRVD_REF>
-          <URI>/sap/bc/adt/ddic/srvd/sources/zui_csddivision_o4</URI>
+          <URI>/sap/bc/adt/ddic/srvd/sources/zsd_pr_auth_v2</URI>
           <TYPE>SRVD/SRV</TYPE>
-          <NAME>ZUI_CSDDIVISION_O4</NAME>
+          <NAME>ZSD_PR_AUTH_V2</NAME>
          </SRVD_REF>
          <BIND_TYPE_DATA>
           <CONTENT>
@@ -43,7 +43,6 @@
     <RELEASE_SUPPORTED>true</RELEASE_SUPPORTED>
     <PUBLISHED>true</PUBLISHED>
     <BINDING_CREATED>true</BINDING_CREATED>
-    <ALLOWED_ACTION>UNPUBLISH</ALLOWED_ACTION>
    </SRVB>
   </asx:values>
  </asx:abap>

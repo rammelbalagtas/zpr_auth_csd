@@ -1,9 +1,9 @@
-@EndUserText.label: 'Item'
 @AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Items'
+@Metadata.ignorePropagatedAnnotations: true
 @Metadata.allowExtensions: true
-//@ObjectModel.query.implementedBy:'ABAP:ZCL_CE_MRPA_OUTPUT'
-define view entity ZC_PR_AUTH2_ITEM
-  as projection on ZR_PR_AUTH2_ITEM
+define view entity ZC_PR_AUTH_ITEM_V2
+  as projection on ZR_PR_AUTH_ITEM_V2
 {
   key PriceAuth,
   key Material,
@@ -58,5 +58,5 @@ define view entity ZC_PR_AUTH2_ITEM
       Locallastchangedat,
       Lastchangedat,
       /* Associations */
-      _Header : redirected to parent ZC_PR_AUTH2_HEAD
+      _Header : redirected to parent ZC_PR_AUTH_HEAD_V2
 }

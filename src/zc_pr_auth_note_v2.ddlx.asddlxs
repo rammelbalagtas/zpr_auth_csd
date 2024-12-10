@@ -1,0 +1,15 @@
+@Metadata.layer: #CORE
+
+@UI: { headerInfo: { typeName:       'Note',
+                     typeNamePlural: 'Notes' } }
+
+annotate entity ZC_PR_AUTH_NOTE_V2
+    with 
+{
+  @UI.lineItem: [{ position: 10 }]
+  Note;
+  @UI.lineItem: [{ position: 20 }]
+  Localcreatedby;
+  @UI.lineItem: [{ position: 30 }]
+  Localcreatedat;
+}

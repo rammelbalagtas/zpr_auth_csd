@@ -1,9 +1,8 @@
-@EndUserText.label: 'Item'
 @AccessControl.authorizationCheck: #NOT_REQUIRED
-@Metadata.allowExtensions: true
-//@ObjectModel.query.implementedBy:'ABAP:ZCL_CE_MRPA_OUTPUT'
-define view entity ZC_PR_AUTH2_ITEM
-  as projection on ZR_PR_AUTH2_ITEM
+@EndUserText.label: 'Price Authorization - Impacted FG'
+define view entity ZR_PR_AUTH_IMPFG_V2
+  as select from ZI_PR_AUTH2_IMPFG
+  association to parent ZR_PR_AUTH_HEAD_V2 as _Header on $projection.PriceAuth = _Header.PriceAuth
 {
   key PriceAuth,
   key Material,
@@ -51,12 +50,10 @@ define view entity ZC_PR_AUTH2_ITEM
       Zpr14New,
       Zpr15Curr,
       Zpr15New,
-      Criticality,
       Localcreatedby,
       Localcreatedat,
       Locallastchangedby,
       Locallastchangedat,
       Lastchangedat,
-      /* Associations */
-      _Header : redirected to parent ZC_PR_AUTH2_HEAD
+      _Header
 }

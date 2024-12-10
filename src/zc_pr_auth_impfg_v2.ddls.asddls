@@ -1,9 +1,8 @@
-@EndUserText.label: 'Item'
+@EndUserText.label: 'Impacted Finished Goods'
 @AccessControl.authorizationCheck: #NOT_REQUIRED
 @Metadata.allowExtensions: true
-//@ObjectModel.query.implementedBy:'ABAP:ZCL_CE_MRPA_OUTPUT'
-define view entity ZC_PR_AUTH2_ITEM
-  as projection on ZR_PR_AUTH2_ITEM
+define view entity ZC_PR_AUTH_IMPFG_V2
+  as projection on ZR_PR_AUTH_IMPFG_V2
 {
   key PriceAuth,
   key Material,
@@ -51,12 +50,11 @@ define view entity ZC_PR_AUTH2_ITEM
       Zpr14New,
       Zpr15Curr,
       Zpr15New,
-      Criticality,
       Localcreatedby,
       Localcreatedat,
       Locallastchangedby,
       Locallastchangedat,
       Lastchangedat,
       /* Associations */
-      _Header : redirected to parent ZC_PR_AUTH2_HEAD
+      _Header : redirected to parent ZC_PR_AUTH_HEAD_V2
 }

@@ -2,19 +2,43 @@ CLASS lhc_items DEFINITION INHERITING FROM cl_abap_behavior_handler.
 
   PRIVATE SECTION.
 
-    METHODS onSelectMaterial FOR DETERMINE ON MODIFY
-      IMPORTING keys FOR Items~onSelectMaterial.
     METHODS get_instance_features FOR INSTANCE FEATURES
       IMPORTING keys REQUEST requested_features FOR Items RESULT result.
+
+    METHODS onSelectMaterial FOR DETERMINE ON MODIFY
+      IMPORTING keys FOR Items~onSelectMaterial.
 
 ENDCLASS.
 
 CLASS lhc_items IMPLEMENTATION.
 
+  METHOD get_instance_features.
+    READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
+    ENTITY Header
+      FIELDS ( Status )
+      WITH CORRESPONDING #(  keys  )
+    RESULT DATA(lt_header)
+    ENTITY Items
+    ALL FIELDS WITH CORRESPONDING #(  keys  )
+    RESULT DATA(lt_items).
+
+    READ TABLE lt_header INTO DATA(ls_header) INDEX 1.
+
+    result = VALUE #( FOR item IN lt_items
+                        ( %tky      = item-%tky
+                          %update  = COND #( WHEN ls_header-status = 'New' OR ls_header-status = 'Draft' OR ls_header-status = 'Rejected'
+                                                     THEN if_abap_behv=>fc-o-enabled
+                                                     ELSE if_abap_behv=>fc-o-disabled  )
+                          %delete  = COND #( WHEN ls_header-status = 'New' OR ls_header-status = 'Draft' OR ls_header-status = 'Rejected'
+                                                     THEN if_abap_behv=>fc-o-enabled
+                                                     ELSE if_abap_behv=>fc-o-disabled  )
+                                                      ) ).
+  ENDMETHOD.
+
   METHOD onSelectMaterial.
 
     DATA lr_material TYPE RANGE OF zmatnr.
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
         ENTITY Header
         ALL FIELDS WITH CORRESPONDING #( keys )
         RESULT DATA(lt_header)
@@ -37,7 +61,7 @@ CLASS lhc_items IMPLEMENTATION.
 
     IF lr_material IS NOT INITIAL.
 
-      READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+      READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
       ENTITY Header
       BY \_Items
       ALL FIELDS WITH
@@ -45,7 +69,7 @@ CLASS lhc_items IMPLEMENTATION.
       RESULT DATA(lt_all_items).
 
       DATA(lv_count) = lines( lt_all_items ).
-      MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+      MODIFY ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
                ENTITY Header
                  UPDATE
                    FIELDS ( Materialcount )
@@ -57,7 +81,7 @@ CLASS lhc_items IMPLEMENTATION.
                FAILED DATA(upd_failed)
                REPORTED DATA(upd_reported).
 
-      MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+      MODIFY ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
          ENTITY Items
            UPDATE
              FIELDS (   Zp1Curr
@@ -107,7 +131,7 @@ CLASS lhc_items IMPLEMENTATION.
 *      IF sy-subrc EQ 0.
 *        SORT lt_config BY configmat ASCENDING.
 *        DELETE ADJACENT DUPLICATES FROM lt_config COMPARING configmat.
-*        DATA lt_impactedfg_new TYPE TABLE FOR CREATE zr_pr_auth2_head\_ImpactedGoods.
+*        DATA lt_impactedfg_new TYPE TABLE FOR CREATE zr_pr_auth_head_v2\_ImpactedGoods.
 *        READ TABLE keys INTO DATA(ls_key) INDEX 1.
 *        lt_impactedfg_new = VALUE #( (  %is_draft = ls_key-%is_draft
 *                                        PriceAuth = ls_key-PriceAuth
@@ -124,7 +148,7 @@ CLASS lhc_items IMPLEMENTATION.
 *                                                                                                            ZGoNew      = if_abap_behv=>mk-on ) ) ) ) ).
 *      ENDIF.
 *
-*      READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+*      READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
 *      ENTITY Header
 *      BY \_ImpactedGoods
 *      ALL FIELDS WITH
@@ -132,7 +156,7 @@ CLASS lhc_items IMPLEMENTATION.
 *      RESULT DATA(lt_impactedfg_current).
 *
 *      "Delete already existing entries from child entity
-*      MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+*      MODIFY ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
 *      ENTITY ImpactedGoods
 *      DELETE FROM VALUE #( FOR ls_impactedfg IN lt_impactedfg_current (  %is_draft = ls_impactedfg-%is_draft
 *                                                                             %key  = ls_impactedfg-%key ) )
@@ -141,7 +165,7 @@ CLASS lhc_items IMPLEMENTATION.
 *      FAILED DATA(lt_failed_delete).
 *
 *      "Create records from newly extract data
-*      MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+*      MODIFY ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
 *      ENTITY Header
 *      CREATE BY \_ImpactedGoods
 *      AUTO FILL CID
@@ -151,29 +175,7 @@ CLASS lhc_items IMPLEMENTATION.
 *      FAILED DATA(lt_item_failed).
 
     ENDIF.
-  ENDMETHOD.
 
-  METHOD get_instance_features.
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
-    ENTITY Header
-      FIELDS ( Status )
-      WITH CORRESPONDING #(  keys  )
-    RESULT DATA(lt_header)
-    ENTITY Items
-    ALL FIELDS WITH CORRESPONDING #(  keys  )
-    RESULT DATA(lt_items).
-
-    READ TABLE lt_header INTO DATA(ls_header) INDEX 1.
-
-    result = VALUE #( FOR item IN lt_items
-                        ( %tky      = item-%tky
-                          %update  = COND #( WHEN ls_header-status = 'New' OR ls_header-status = 'Draft' OR ls_header-status = 'Rejected'
-                                                     THEN if_abap_behv=>fc-o-enabled
-                                                     ELSE if_abap_behv=>fc-o-disabled  )
-                          %delete  = COND #( WHEN ls_header-status = 'New' OR ls_header-status = 'Draft' OR ls_header-status = 'Rejected'
-                                                     THEN if_abap_behv=>fc-o-enabled
-                                                     ELSE if_abap_behv=>fc-o-disabled  )
-                                                      ) ).
   ENDMETHOD.
 
 ENDCLASS.
@@ -183,32 +185,27 @@ CLASS lhc_Header DEFINITION INHERITING FROM cl_abap_behavior_handler.
 
     METHODS get_instance_authorizations FOR INSTANCE AUTHORIZATION
       IMPORTING keys REQUEST requested_authorizations FOR Header RESULT result.
+    METHODS get_instance_features FOR INSTANCE FEATURES
+      IMPORTING keys REQUEST requested_features FOR header RESULT result.
+
     METHODS exportfile FOR MODIFY
       IMPORTING keys FOR ACTION header~exportfile RESULT result.
 
     METHODS importfile FOR MODIFY
       IMPORTING keys FOR ACTION header~importfile RESULT result.
 
-    METHODS submit FOR MODIFY
-      IMPORTING keys FOR ACTION header~submit RESULT result.
-
     METHODS validateentries FOR MODIFY
       IMPORTING keys FOR ACTION header~validateentries.
+
     METHODS setdefaultvalues FOR DETERMINE ON MODIFY
       IMPORTING keys FOR header~setdefaultvalues.
-*    METHODS get_instance_features FOR INSTANCE FEATURES
-*      IMPORTING keys REQUEST requested_features FOR header RESULT result.
+
     METHODS onsave FOR DETERMINE ON SAVE
       IMPORTING keys FOR header~onsave.
-    METHODS get_instance_features FOR INSTANCE FEATURES
-      IMPORTING keys REQUEST requested_features FOR header RESULT result.
-    METHODS resume FOR MODIFY
-      IMPORTING keys FOR ACTION header~resume.
-
+    METHODS submit FOR MODIFY
+      IMPORTING keys FOR ACTION header~submit RESULT result.
     METHODS earlynumbering_create FOR NUMBERING
-      IMPORTING entities FOR CREATE Header.
-
-    METHODS populate_impactedgoods.
+      IMPORTING entities FOR CREATE header.
 
 ENDCLASS.
 
@@ -217,61 +214,10 @@ CLASS lhc_Header IMPLEMENTATION.
   METHOD get_instance_authorizations.
   ENDMETHOD.
 
-  METHOD earlynumbering_create.
-    DATA:
-      entity        TYPE STRUCTURE FOR CREATE zr_pr_auth2_head,
-      priceauth_max TYPE n LENGTH 10.
-
-    " Ensure PR Auth ID is not set yet (idempotent)- must be checked when BO is draft-enabled
-    LOOP AT entities INTO entity WHERE priceauth IS NOT INITIAL.
-      APPEND CORRESPONDING #( entity ) TO mapped-header.
-    ENDLOOP.
-
-    DATA(entities_wo_id) = entities.
-    DELETE entities_wo_id WHERE priceauth IS NOT INITIAL.
-
-    " Get Numbers
-    TRY.
-        cl_numberrange_runtime=>number_get(
-          EXPORTING
-            nr_range_nr       = '01'
-            object            = '/DMO/TRV_M'
-            quantity          = CONV #( lines( entities_wo_id ) )
-          IMPORTING
-            number            = DATA(number_range_key)
-            returncode        = DATA(number_range_return_code)
-            returned_quantity = DATA(number_range_returned_quantity)
-        ).
-      CATCH cx_number_ranges INTO DATA(lx_number_ranges).
-        LOOP AT entities_wo_id INTO entity.
-          APPEND VALUE #(  %cid = entity-%cid
-                           %key = entity-%key
-                           %msg = lx_number_ranges
-                        ) TO reported-header.
-          APPEND VALUE #(  %cid = entity-%cid
-                           %key = entity-%key
-                        ) TO failed-header.
-        ENDLOOP.
-        EXIT.
-    ENDTRY.
-
-    priceauth_max = number_range_key - number_range_returned_quantity.
-
-    " Set Price Authorization ID
-    LOOP AT entities_wo_id INTO entity.
-      priceauth_max += 1.
-      entity-priceauth = priceauth_max .
-
-      APPEND VALUE #( %cid  = entity-%cid
-*                      %key  = entity-%key
-                      priceauth = priceauth_max
-                      %is_draft = if_abap_behv=>mk-on
-                    ) TO mapped-header.
-    ENDLOOP.
+  METHOD get_instance_features.
   ENDMETHOD.
 
   METHOD exportFile.
-
     TYPES:
       BEGIN OF ty_excel,
         material TYPE c LENGTH 18,
@@ -280,7 +226,7 @@ CLASS lhc_Header IMPLEMENTATION.
     DATA lt_excel TYPE STANDARD TABLE OF ty_excel.
     DATA ls_excel LIKE LINE OF lt_excel.
 
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
       ENTITY Header
          ALL FIELDS
       WITH CORRESPONDING #( keys )
@@ -324,7 +270,7 @@ CLASS lhc_Header IMPLEMENTATION.
 
     DATA(lv_file_content) = lo_xlsx->get_file_content( ).
 
-    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    MODIFY ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
      ENTITY Header
        UPDATE
          FIELDS ( AttachmentDownload MimeTypeDownload FilenameDownload )
@@ -340,7 +286,7 @@ CLASS lhc_Header IMPLEMENTATION.
      FAILED failed
      REPORTED reported.
 
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
        ENTITY Header
           ALL FIELDS
        WITH CORRESPONDING #( keys )
@@ -356,7 +302,6 @@ CLASS lhc_Header IMPLEMENTATION.
 
                     ) TO reported-header.
     ENDIF.
-
   ENDMETHOD.
 
   METHOD importFile.
@@ -369,7 +314,7 @@ CLASS lhc_Header IMPLEMENTATION.
            tt_row TYPE STANDARD TABLE OF ty_excel.
     DATA lt_rows TYPE tt_row.
 
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
           ENTITY Header
           ALL FIELDS WITH
           CORRESPONDING #( keys )
@@ -407,12 +352,12 @@ CLASS lhc_Header IMPLEMENTATION.
     lo_execute->set_value_transformation( xco_cp_xlsx_read_access=>value_transformation->string_value
                )->if_xco_xlsx_ra_operation~execute( ).
     "add materials
-    DATA lt_material TYPE TABLE FOR CREATE zr_pr_auth2_head\_Items.
+    DATA lt_material TYPE TABLE FOR CREATE zr_pr_auth_head_v2\_Items.
     lt_material = VALUE #( FOR ls_key IN keys (
-                              %is_draft = ls_key-%is_draft
+*                              %is_draft = ls_key-%is_draft
                               PriceAuth = ls_key-PriceAuth
                               %target   = VALUE #( FOR ls_row IN lt_rows (
-                                                                            %is_draft = ls_key-%is_draft
+
                                                                             PriceAuth = ls_key-PriceAuth
                                                                             Material = ls_row-Material
                                                                             ZP1New = ls_row-ZP1New
@@ -425,7 +370,7 @@ CLASS lhc_Header IMPLEMENTATION.
                                                                                                 ZGoNew      = if_abap_behv=>mk-on ) ) ) ) ).
 
     ">>> Start: Refresh and populate items entity
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
         ENTITY Header
         BY \_Items
         ALL FIELDS WITH
@@ -433,16 +378,15 @@ CLASS lhc_Header IMPLEMENTATION.
         RESULT DATA(lt_item).
 
     "Delete already existing entries from child entity
-    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    MODIFY ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
     ENTITY Items
-    DELETE FROM VALUE #( FOR ls_item IN lt_item (  %is_draft = ls_item-%is_draft
-                                                       %key  = ls_item-%key ) )
+    DELETE FROM VALUE #( FOR ls_item IN lt_item ( %key  = ls_item-%key ) )
     MAPPED DATA(lt_mapped_delete)
     REPORTED DATA(lt_reported_delete)
     FAILED DATA(lt_failed_delete).
 
     "Create records from newly extract data
-    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    MODIFY ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
     ENTITY Header
     CREATE BY \_Items
     AUTO FILL CID
@@ -453,7 +397,7 @@ CLASS lhc_Header IMPLEMENTATION.
     "<<< End: Refresh and populate item entity
 
     ">>> Start: Refresh and populate impacted goods
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
     ENTITY Header
     BY \_Items
     ALL FIELDS WITH
@@ -464,11 +408,11 @@ CLASS lhc_Header IMPLEMENTATION.
     IF sy-subrc EQ 0.
       SORT lt_config BY configmat ASCENDING.
       DELETE ADJACENT DUPLICATES FROM lt_config COMPARING configmat.
-      DATA lt_impactedfg_new TYPE TABLE FOR CREATE zr_pr_auth2_head\_ImpactedGoods.
+      DATA lt_impactedfg_new TYPE TABLE FOR CREATE zr_pr_auth_head_v2\_ImpactedGoods.
       READ TABLE keys INTO DATA(ls_key1) INDEX 1.
-      lt_impactedfg_new = VALUE #( (  %is_draft = ls_key1-%is_draft
+      lt_impactedfg_new = VALUE #( (
                                       PriceAuth = ls_key1-PriceAuth
-                                      %target   = VALUE #( FOR config IN lt_config (  %is_draft = ls_key1-%is_draft
+                                      %target   = VALUE #( FOR config IN lt_config (
                                                                                       PriceAuth = ls_key1-PriceAuth
                                                                                       Material  = config-configmat
                                                                                       ZP1New = 10
@@ -481,7 +425,7 @@ CLASS lhc_Header IMPLEMENTATION.
                                                                                                           ZGoNew      = if_abap_behv=>mk-on ) ) ) ) ).
     ENDIF.
 
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
     ENTITY Header
     BY \_ImpactedGoods
     ALL FIELDS WITH
@@ -489,16 +433,16 @@ CLASS lhc_Header IMPLEMENTATION.
     RESULT DATA(lt_impactedfg_current).
 
     "Delete already existing entries from child entity
-    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    MODIFY ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
     ENTITY ImpactedGoods
-    DELETE FROM VALUE #( FOR ls_impactedfg IN lt_impactedfg_current (  %is_draft = ls_impactedfg-%is_draft
+    DELETE FROM VALUE #( FOR ls_impactedfg IN lt_impactedfg_current (
                                                                            %key  = ls_impactedfg-%key ) )
     MAPPED DATA(lt_mapped_delete_ig)
     REPORTED DATA(lt_reported_delete_ig)
     FAILED DATA(lt_failed_delete_ig).
 
     "Create records from newly extract data
-    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    MODIFY ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
     ENTITY Header
     CREATE BY \_ImpactedGoods
     AUTO FILL CID
@@ -510,7 +454,7 @@ CLASS lhc_Header IMPLEMENTATION.
 
     APPEND VALUE #( %tky = lt_header[ 1 ]-%tky ) TO mapped-header.
 
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
         ENTITY Header
         ALL FIELDS WITH
         CORRESPONDING #( keys )
@@ -532,7 +476,7 @@ CLASS lhc_Header IMPLEMENTATION.
                     ) TO reported-header.
     ENDIF.
 
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
     ENTITY Header
     BY \_Items
     ALL FIELDS WITH
@@ -556,7 +500,7 @@ CLASS lhc_Header IMPLEMENTATION.
     DATA(lv_notes_count) = lines( lt_all_notes ).
     DATA(lv_messages_count) = lines( lt_all_messages ).
 
-    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    MODIFY ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
              ENTITY Header
                UPDATE
                  FIELDS ( Materialcount Impactedfgcount Notescount Messagescount )
@@ -573,69 +517,10 @@ CLASS lhc_Header IMPLEMENTATION.
     result = VALUE #( FOR header IN lt_header
                           ( %tky   = header-%tky
                             %param = header ) ).
-
-  ENDMETHOD.
-
-  METHOD populate_impactedgoods.
-  ENDMETHOD.
-
-  METHOD submit.
-
-    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
-     ENTITY Header
-       UPDATE
-         FIELDS ( Status )
-        WITH VALUE #( FOR key IN keys
-                         ( %tky   = key-%tky
-                           Status = 'Submitted for Category Manager Approval' ) ).
-
-* Check if there are any draft instances?
-    DATA(lt_draft_docs) = keys.
-    DELETE lt_draft_docs WHERE %is_draft = if_abap_behv=>mk-off.
-
-    IF lt_draft_docs IS NOT INITIAL.
-
-      MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
-       ENTITY Header
-         EXECUTE Activate FROM
-         VALUE #( FOR key IN keys ( %key = key-%key ) )
-       MAPPED DATA(activate_mapped)
-       FAILED DATA(activate_failed)
-       REPORTED DATA(activate_reported).
-
-    ENDIF.
-
-    DATA(lt_keys) = keys.
-    LOOP AT lt_keys ASSIGNING FIELD-SYMBOL(<fs_key>).
-      <fs_key>-%is_draft = if_abap_behv=>mk-off.
-    ENDLOOP.
-
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
-        ENTITY Header
-        ALL FIELDS WITH
-        CORRESPONDING #( lt_keys )
-        RESULT DATA(lt_header).
-
-    result = VALUE #( FOR new_key IN lt_keys
-                          ( %key   = keys[ 1 ]-%key
-                            %tky   = keys[ 1 ]-%tky
-                            %param-%key = new_key-%key ) ).
-
-* Populate %key , %tky  to be filled from source instance while %param-%key to be filled from new instance.
-*    result = VALUE #( for <fs_old_key> in keys
-*                      for <fs_new_key> IN lt_keys WHERE ( Priceauth = <Fs_old_key>-Priceauth )
-*                                                        ( %key = <fs_old_key>-%key
-*                                                          %tky = <fs_old_key>-%tky
-*                                                          %param-%key = <fs_new_key>-%key ) ).
-
-
-    mapped-header = CORRESPONDING #( lt_header ).
-
   ENDMETHOD.
 
   METHOD validateEntries.
-
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
          ENTITY Header
          ALL FIELDS WITH
          CORRESPONDING #( keys )
@@ -702,7 +587,7 @@ CLASS lhc_Header IMPLEMENTATION.
 *      ENDIF.
     ENDLOOP.
 
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
     ENTITY Header
     BY \_Items
     ALL FIELDS WITH
@@ -713,11 +598,11 @@ CLASS lhc_Header IMPLEMENTATION.
     IF sy-subrc EQ 0.
       SORT lt_config BY configmat ASCENDING.
       DELETE ADJACENT DUPLICATES FROM lt_config COMPARING configmat.
-      DATA lt_impactedfg_new TYPE TABLE FOR CREATE zr_pr_auth2_head\_ImpactedGoods.
+      DATA lt_impactedfg_new TYPE TABLE FOR CREATE zr_pr_auth_head_v2\_ImpactedGoods.
       READ TABLE keys INTO DATA(ls_key) INDEX 1.
-      lt_impactedfg_new = VALUE #( (  %is_draft = ls_key-%is_draft
+      lt_impactedfg_new = VALUE #( (
                                       PriceAuth = ls_key-PriceAuth
-                                      %target   = VALUE #( FOR config IN lt_config (  %is_draft = ls_key-%is_draft
+                                      %target   = VALUE #( FOR config IN lt_config (
                                                                                       PriceAuth = ls_key-PriceAuth
                                                                                       Material  = config-configmat
                                                                                       ZP1New = 10
@@ -730,7 +615,7 @@ CLASS lhc_Header IMPLEMENTATION.
                                                                                                           ZGoNew      = if_abap_behv=>mk-on ) ) ) ) ).
     ENDIF.
 
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
     ENTITY Header
     BY \_ImpactedGoods
     ALL FIELDS WITH
@@ -738,16 +623,16 @@ CLASS lhc_Header IMPLEMENTATION.
     RESULT DATA(lt_impactedfg_current).
 
     "Delete already existing entries from child entity
-    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    MODIFY ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
     ENTITY ImpactedGoods
-    DELETE FROM VALUE #( FOR ls_impactedfg IN lt_impactedfg_current (  %is_draft = ls_impactedfg-%is_draft
+    DELETE FROM VALUE #( FOR ls_impactedfg IN lt_impactedfg_current (
                                                                            %key  = ls_impactedfg-%key ) )
     MAPPED DATA(lt_mapped_delete)
     REPORTED DATA(lt_reported_delete)
     FAILED DATA(lt_failed_delete).
 
     "Create records from newly extract data
-    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    MODIFY ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
     ENTITY Header
     CREATE BY \_ImpactedGoods
     AUTO FILL CID
@@ -764,7 +649,7 @@ CLASS lhc_Header IMPLEMENTATION.
 
     ENDIF.
 
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
     ENTITY Header
     BY \_Items
     ALL FIELDS WITH
@@ -788,7 +673,7 @@ CLASS lhc_Header IMPLEMENTATION.
     DATA(lv_notes_count) = lines( lt_all_notes ).
     DATA(lv_messages_count) = lines( lt_all_messages ).
 
-    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    MODIFY ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
              ENTITY Header
                UPDATE
                  FIELDS ( Materialcount Impactedfgcount Notescount Messagescount )
@@ -801,16 +686,15 @@ CLASS lhc_Header IMPLEMENTATION.
     MAPPED DATA(upd_mapped)
     FAILED DATA(upd_failed)
     REPORTED DATA(upd_reported).
-
   ENDMETHOD.
 
   METHOD setDefaultValues.
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
-    ENTITY Header
-       FIELDS ( Status SalesOrg DistChannel )
-    WITH CORRESPONDING #( keys )
-    RESULT DATA(lt_header).
-    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
+   ENTITY Header
+      FIELDS ( Status SalesOrg DistChannel )
+   WITH CORRESPONDING #( keys )
+   RESULT DATA(lt_header).
+    MODIFY ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
      ENTITY Header
        UPDATE
          FIELDS ( Status SalesOrg DistChannel )
@@ -828,12 +712,12 @@ CLASS lhc_Header IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD onSave.
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
     ENTITY Header
        FIELDS ( Action Status )
     WITH CORRESPONDING #( keys )
     RESULT DATA(lt_header).
-    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    MODIFY ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
      ENTITY Header
        UPDATE
          FIELDS ( Status SubmittedTo )
@@ -859,51 +743,109 @@ CLASS lhc_Header IMPLEMENTATION.
     reported = CORRESPONDING #( DEEP upd_reported ).
   ENDMETHOD.
 
-  METHOD get_instance_features.
-    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
-      ENTITY Header
-        FIELDS ( Status )
-        WITH CORRESPONDING #(  keys  )
-      RESULT DATA(lt_header).
-
-    result = VALUE #( FOR header IN lt_header
-                        ( %tky      = header-%tky
-                          %field-Division  = COND #( WHEN header-status = 'New' OR header-status = 'Draft' OR header-status = 'Rejected'
-                                                     THEN if_abap_behv=>fc-f-unrestricted
-                                                     ELSE if_abap_behv=>fc-f-read_only  )
-                          %field-Description  = COND #( WHEN header-status = 'New' OR header-status = 'Draft' OR header-status = 'Rejected'
-                                                     THEN if_abap_behv=>fc-f-unrestricted
-                                                     ELSE if_abap_behv=>fc-f-read_only  )
-                          %field-ValidFrom  = COND #( WHEN header-status = 'New' OR header-status = 'Draft' OR header-status = 'Rejected'
-                                                     THEN if_abap_behv=>fc-f-unrestricted
-                                                     ELSE if_abap_behv=>fc-f-read_only  )
-                          %field-ValidTo  = COND #( WHEN header-status = 'New' OR header-status = 'Draft' OR header-status = 'Rejected'
-                                                     THEN if_abap_behv=>fc-f-unrestricted
-                                                     ELSE if_abap_behv=>fc-f-read_only  )
-                          %field-SubmittedBy  = COND #( WHEN header-status = 'New' OR header-status = 'Draft' OR header-status = 'Rejected'
-                                                     THEN if_abap_behv=>fc-f-unrestricted
-                                                     ELSE if_abap_behv=>fc-f-read_only  )
-                          %action-validateEntries  = COND #( WHEN header-status = 'New' OR header-status = 'Draft' OR header-status = 'Rejected'
-                                                     THEN if_abap_behv=>fc-o-enabled
-                                                     ELSE if_abap_behv=>fc-o-disabled  )
-                          %action-importFile  = COND #( WHEN header-status = 'New' OR header-status = 'Draft' OR header-status = 'Rejected'
-                                                     THEN if_abap_behv=>fc-o-enabled
-                                                     ELSE if_abap_behv=>fc-o-disabled  )
-                          %assoc-_Items  = COND #( WHEN header-status = 'New' OR header-status = 'Draft' OR header-status = 'Rejected'
-                                                     THEN if_abap_behv=>fc-o-enabled
-                                                     ELSE if_abap_behv=>fc-o-disabled  )
-                          %assoc-_Notes  = COND #( WHEN header-status = 'Posted'
-                                                     THEN if_abap_behv=>fc-o-disabled
-                                                     ELSE if_abap_behv=>fc-o-enabled  )
-                          %update  = COND #( WHEN header-status = 'Posted'
-                                                     THEN if_abap_behv=>fc-o-disabled
-                                                     ELSE if_abap_behv=>fc-o-enabled  )
-                         ) ).
+  METHOD submit.
+*    MODIFY ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
+*    ENTITY Header
+*      UPDATE
+*        FIELDS ( Status )
+*       WITH VALUE #( FOR key IN keys
+*                        ( %tky   = key-%tky
+*                          Status = 'Submitted for Category Manager Approval' ) ).
+*
+** Check if there are any draft instances?
+*    DATA(lt_draft_docs) = keys.
+*    DELETE lt_draft_docs WHERE %is_draft = if_abap_behv=>mk-off.
+*
+*    IF lt_draft_docs IS NOT INITIAL.
+*
+*      MODIFY ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
+*       ENTITY Header
+*         EXECUTE Activate FROM
+*         VALUE #( FOR key IN keys ( %key = key-%key ) )
+*       MAPPED DATA(activate_mapped)
+*       FAILED DATA(activate_failed)
+*       REPORTED DATA(activate_reported).
+*
+*    ENDIF.
+*
+*    DATA(lt_keys) = keys.
+*    LOOP AT lt_keys ASSIGNING FIELD-SYMBOL(<fs_key>).
+*      <fs_key>-%is_draft = if_abap_behv=>mk-off.
+*    ENDLOOP.
+*
+*    READ ENTITIES OF zr_pr_auth_head_v2 IN LOCAL MODE
+*        ENTITY Header
+*        ALL FIELDS WITH
+*        CORRESPONDING #( lt_keys )
+*        RESULT DATA(lt_header).
+*
+*    result = VALUE #( FOR new_key IN lt_keys
+*                          ( %key   = keys[ 1 ]-%key
+*                            %tky   = keys[ 1 ]-%tky
+*                            %param-%key = new_key-%key ) ).
+*
+** Populate %key , %tky  to be filled from source instance while %param-%key to be filled from new instance.
+**    result = VALUE #( for <fs_old_key> in keys
+**                      for <fs_new_key> IN lt_keys WHERE ( Priceauth = <Fs_old_key>-Priceauth )
+**                                                        ( %key = <fs_old_key>-%key
+**                                                          %tky = <fs_old_key>-%tky
+**                                                          %param-%key = <fs_new_key>-%key ) ).
+*
+*
+*    mapped-header = CORRESPONDING #( lt_header ).
   ENDMETHOD.
 
-  METHOD Resume.
-    IF 1 = 1.
-    ENDIF.
+  METHOD earlynumbering_create.
+    DATA:
+      entity        TYPE STRUCTURE FOR CREATE zr_pr_auth_head_V2,
+      priceauth_max TYPE n LENGTH 10.
+
+    " Ensure PR Auth ID is not set yet (idempotent)- must be checked when BO is draft-enabled
+    LOOP AT entities INTO entity WHERE priceauth IS NOT INITIAL.
+      APPEND CORRESPONDING #( entity ) TO mapped-header.
+    ENDLOOP.
+
+    DATA(entities_wo_id) = entities.
+    DELETE entities_wo_id WHERE priceauth IS NOT INITIAL.
+
+    " Get Numbers
+    TRY.
+        cl_numberrange_runtime=>number_get(
+          EXPORTING
+            nr_range_nr       = '01'
+            object            = '/DMO/TRV_M'
+            quantity          = CONV #( lines( entities_wo_id ) )
+          IMPORTING
+            number            = DATA(number_range_key)
+            returncode        = DATA(number_range_return_code)
+            returned_quantity = DATA(number_range_returned_quantity)
+        ).
+      CATCH cx_number_ranges INTO DATA(lx_number_ranges).
+        LOOP AT entities_wo_id INTO entity.
+          APPEND VALUE #(  %cid = entity-%cid
+                           %key = entity-%key
+                           %msg = lx_number_ranges
+                        ) TO reported-header.
+          APPEND VALUE #(  %cid = entity-%cid
+                           %key = entity-%key
+                        ) TO failed-header.
+        ENDLOOP.
+        EXIT.
+    ENDTRY.
+
+    priceauth_max = number_range_key - number_range_returned_quantity.
+
+    " Set Price Authorization ID
+    LOOP AT entities_wo_id INTO entity.
+      priceauth_max += 1.
+      entity-priceauth = priceauth_max .
+
+      APPEND VALUE #( %cid  = entity-%cid
+*                      %key  = entity-%key
+                      priceauth = priceauth_max
+*                      %is_draft = if_abap_behv=>mk-on
+                    ) TO mapped-header.
+    ENDLOOP.
   ENDMETHOD.
 
 ENDCLASS.

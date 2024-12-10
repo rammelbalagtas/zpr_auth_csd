@@ -12,7 +12,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_prauth_action_vh IMPLEMENTATION.
+CLASS ZCL_PRAUTH_ACTION_VH IMPLEMENTATION.
 
 
   METHOD if_rap_query_provider~select.

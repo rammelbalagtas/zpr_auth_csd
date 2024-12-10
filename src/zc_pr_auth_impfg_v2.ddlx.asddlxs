@@ -1,0 +1,87 @@
+@Metadata.layer: #CORE
+
+@UI: { headerInfo: { typeName:       'Impacted Goods',
+                     typeNamePlural: 'Impacted Goods',
+                     title:          { type: #STANDARD,
+                                       label: 'Material',
+                                       value: 'Material' } } }
+
+annotate entity ZC_PR_AUTH_IMPFG_V2 with
+{
+  @UI.lineItem: [{ position: 10 }]
+  Material;
+  @UI.lineItem: [{ position: 20 }]
+  GpZpxNew;
+  @UI.lineItem: [{ position: 30 }]
+  GpZpxCurr;
+  @UI.lineItem: [{ position: 40 }]
+  GpZprNew;
+  @UI.lineItem: [{ position: 50 }]
+  GpZprCurr;
+  @UI.lineItem: [{ position: 70 }]
+  ZgoNew;
+  @UI.lineItem: [{ position: 80 }]
+  ZgoCurr;
+  @UI.lineItem: [{ position: 90 }]
+  ZpxNew;
+  @UI.lineItem: [{ position: 100 }]
+  ZpxCurr;
+  @UI.lineItem: [{ position: 110 }]
+  Zpr02New;
+  @UI.lineItem: [{ position: 120 }]
+  Zpr02Curr;
+  @UI.lineItem: [{ position: 130 }]
+  Zpr03New;
+  @UI.lineItem: [{ position: 140 }]
+  Zpr03Curr;
+  @UI.lineItem: [{ position: 150 }]
+  Zpr04New;
+  @UI.lineItem: [{ position: 160 }]
+  Zpr04Curr;
+  @UI.lineItem: [{ position: 170 }]
+  Zpr05New;
+  @UI.lineItem: [{ position: 180 }]
+  Zpr05Curr;
+  @UI.lineItem: [{ position: 190 }]
+  Zpr06New;
+  @UI.lineItem: [{ position: 200 }]
+  Zpr06Curr;
+  @UI.lineItem: [{ position: 210 }]
+  Zpr07New;
+  @UI.lineItem: [{ position: 220 }]
+  Zpr07Curr;
+  @UI.lineItem: [{ position: 230 }]
+  Zpr08New;
+  @UI.lineItem: [{ position: 240 }]
+  Zpr08Curr;
+  @UI.lineItem: [{ position: 250 }]
+  Zpr09New;
+  @UI.lineItem: [{ position: 260 }]
+  Zpr09Curr;
+  @UI.lineItem: [{ position: 270 }]
+  Zpr10New;
+  @UI.lineItem: [{ position: 280 }]
+  Zpr10Curr;
+  @UI.lineItem: [{ position: 290 }]
+  Zpr11New;
+  @UI.lineItem: [{ position: 300 }]
+  Zpr11Curr;
+  @UI.lineItem: [{ position: 310 }]
+  Zpr12New;
+  @UI.lineItem: [{ position: 320 }]
+  Zpr12Curr;
+  @UI.lineItem: [{ position: 330}]
+  Zpr13New;
+  @UI.lineItem: [{ position: 340 }]
+  Zpr13Curr;
+  @UI.lineItem: [{ position: 350 }]
+  Zpr14New;
+  @UI.lineItem: [{ position: 360 }]
+  Zpr14Curr;
+  @UI.lineItem: [{ position: 370 }]
+  Zpr15New;
+  @UI.lineItem: [{ position: 380 }]
+  Zpr15Curr;
+  @UI.lineItem: [{ position: 390 }]
+  Map;
+}

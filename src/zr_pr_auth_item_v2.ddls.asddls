@@ -1,11 +1,21 @@
-@EndUserText.label: 'Item'
+@AbapCatalog.viewEnhancementCategory: [#NONE]
 @AccessControl.authorizationCheck: #NOT_REQUIRED
-@Metadata.allowExtensions: true
-//@ObjectModel.query.implementedBy:'ABAP:ZCL_CE_MRPA_OUTPUT'
-define view entity ZC_PR_AUTH2_ITEM
-  as projection on ZR_PR_AUTH2_ITEM
+@EndUserText.label: 'PR Authorization - Item'
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.usageType:{
+    serviceQuality: #X,
+    sizeCategory: #S,
+    dataClass: #MIXED
+}
+define view entity ZR_PR_AUTH_ITEM_V2
+  as select from ZI_PR_AUTH2_ITEM
+  association to parent ZR_PR_AUTH_HEAD_V2 as _Header on $projection.PriceAuth = _Header.PriceAuth
 {
   key PriceAuth,
+    @Consumption.valueHelpDefinition: [{ entity: {name: 'ZI_PR_CSD_MAT_STDVH' , element: 'Material' }, useForValidation: true,
+                   additionalBinding: [{ localElement: '_Header.Salesorg', element: 'Salesorg', usage: #FILTER },
+                                       { localElement: '_Header.Distchannel', element: 'Distchannel', usage: #FILTER },
+                                       { localElement: '_Header.Division', element: 'Division', usage: #FILTER }] }]
   key Material,
       Sequence,
       ItemType,
@@ -57,6 +67,6 @@ define view entity ZC_PR_AUTH2_ITEM
       Locallastchangedby,
       Locallastchangedat,
       Lastchangedat,
-      /* Associations */
-      _Header : redirected to parent ZC_PR_AUTH2_HEAD
+      _Header
+//      _Material
 }

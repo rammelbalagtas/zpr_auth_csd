@@ -1,0 +1,52 @@
+projection;
+strict ( 2 );
+use side effects;
+
+define behavior for ZC_PR_AUTH_HEAD_V2 //alias <alias_name>
+use etag
+{
+  use create;
+  use update;
+  use delete;
+
+  use action importFile;
+  use action exportFile;
+  use action validateEntries;
+  use action submit;
+
+  use association _ImpactedGoods;
+  use association _Items { create; }
+  use association _Messages;
+  use association _Notes { create; }
+}
+
+define behavior for ZC_PR_AUTH_IMPFG_V2 //alias <alias_name>
+use etag
+{
+
+  use association _Header;
+}
+
+define behavior for ZC_PR_AUTH_ITEM_V2 //alias <alias_name>
+use etag
+{
+  use update;
+  use delete;
+
+  use association _Header;
+}
+
+define behavior for ZC_PR_AUTH_MSGS_V2 //alias <alias_name>
+use etag
+{
+
+  use association _Header;
+}
+
+define behavior for ZC_PR_AUTH_NOTE_V2 //alias <alias_name>
+use etag
+{
+  use update;
+
+  use association _Header;
+}

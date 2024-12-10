@@ -1,0 +1,22 @@
+{
+  "formatVersion": "1",
+  "header": {
+    "description": "Event binding for price authorization change",
+    "originalLanguage": "en",
+    "abapLanguageVersion": "cloudDevelopment"
+  },
+  "producerNamespace": "zsap.rb.pci",
+  "producer": "PA9F7B03E6F13D4C9FCD7724473CFACD2",
+  "producerVersion": "0001",
+  "boName": "ZPRICEAUTH",
+  "boOperation": "Created",
+  "producerType": "zsap.rb.pci.ZPRICEAUTH.Created.v*",
+  "events": [
+    {
+      "eventVersion": "0001",
+      "eventMinorVersion": 1,
+      "entityName": "ZR_PR_AUTH2_HEAD",
+      "entityEventName": "PRICEAUTHCREATED"
+    }
+  ]
+}

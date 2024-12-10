@@ -1,0 +1,14 @@
+@EndUserText.label: 'Price Authorization (CSD)'
+define service ZSD_PR_AUTH_V2 {
+  expose ZC_PR_AUTH_HEAD_V2;
+  expose ZC_PR_AUTH_ITEM_V2;
+  expose ZC_PR_AUTH_IMPFG_V2;
+  expose ZC_PR_AUTH_MSGS_V2;
+  expose ZC_PR_AUTH_NOTE_V2;
+  expose zi_pr_csd_mat_stdvh;
+  expose zcsd_division_stdvh;
+  expose ZI_SUBMITTEDTO_VH;
+  expose ZI_SUBMITTEDBY_VH;
+  expose ZPRAUTH_I_SUBMITTOVH;
+  expose ZPRAUTH_I_ACTIONVH;
+}

@@ -12,7 +12,7 @@ ENDCLASS.
 
 
 
-CLASS zpr_auth_datagenerator IMPLEMENTATION.
+CLASS ZPR_AUTH_DATAGENERATOR IMPLEMENTATION.
 
 
   METHOD if_oo_adt_classrun~main.

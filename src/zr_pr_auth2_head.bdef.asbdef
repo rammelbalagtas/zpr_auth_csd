@@ -5,9 +5,9 @@ with draft;
 define behavior for ZR_PR_AUTH2_HEAD alias Header
 persistent table zpr_auth2_head
 draft table zdpr_auth2_head
-etag master Locallastchangedat
 lock master total etag Lastchangedat
 early numbering
+etag master Locallastchangedat
 authorization master ( instance )
 {
   create;
@@ -16,14 +16,14 @@ authorization master ( instance )
   field ( readonly ) PriceAuth, SalesOrg, DistChannel, AttachmentDownload;
   field ( features : instance ) Description, ValidFrom, ValidTo, SubmittedBy, Division;
   field ( mandatory ) Description, ValidFrom, ValidTo, SubmitTo, Division;
-  association _Items  { create ( features : instance ); with draft ; }
+  association _Items { create ( features : instance ); with draft; }
   association _ImpactedGoods { internal create; with draft; }
   association _Messages { internal create; with draft; }
   association _Notes { create ( features : instance ); with draft; }
 
   determination setDefaultValues on modify { create; }
   determination onSave on save { field Action; field Description; }
-//    determination onSave on save { create; update; }
+  //    determination onSave on save { create; update; }
 
   draft action Edit;
   draft action Activate optimized;
@@ -43,6 +43,7 @@ authorization master ( instance )
     action exportFile affects $self;
     action importFile affects entity _Items, entity _ImpactedGoods;
     action validateEntries affects field Materialcount, field Impactedfgcount, field Notescount, field Messagescount, entity _ImpactedGoods;
+    entity _Items affects entity _ImpactedGoods, $self;
   }
 
   mapping for zpr_auth2_head
@@ -94,7 +95,13 @@ etag master LocalLastChangedAt
   field ( mandatory : create ) Material;
   association _Header { with draft; }
 
-  determination onSelectMaterial on modify { create; field Material; }
+  determination onSelectMaterial on modify { create; }
+  determination onDeleteMaterial on modify { delete; }
+//  determine action ( authorization : update ) selectMaterial { determination onSelectMaterial; }
+//  side effects
+//  {
+//    field Material affects $self, entity _Header;
+//  }
 
   mapping for zpr_auth2_item
     {

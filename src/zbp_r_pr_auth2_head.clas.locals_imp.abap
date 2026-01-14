@@ -6,6 +6,8 @@ CLASS lhc_items DEFINITION INHERITING FROM cl_abap_behavior_handler.
       IMPORTING keys FOR Items~onSelectMaterial.
     METHODS get_instance_features FOR INSTANCE FEATURES
       IMPORTING keys REQUEST requested_features FOR Items RESULT result.
+    METHODS ondeletematerial FOR DETERMINE ON MODIFY
+      IMPORTING keys FOR items~ondeletematerial.
 
 ENDCLASS.
 
@@ -18,7 +20,7 @@ CLASS lhc_items IMPLEMENTATION.
         ENTITY Header
         ALL FIELDS WITH CORRESPONDING #( keys )
         RESULT DATA(lt_header)
-        ENTITY Items
+        BY \_Items
         ALL FIELDS WITH CORRESPONDING #( keys )
         RESULT DATA(lt_item).
 
@@ -52,6 +54,7 @@ CLASS lhc_items IMPLEMENTATION.
                    WITH VALUE #( FOR header IN lt_header
                                    ( %tky    = header-%tky
                                      Materialcount = lv_count
+                                     %control = VALUE #( Materialcount   = if_abap_behv=>mk-on )
                                       ) )
                MAPPED DATA(upd_mapped)
                FAILED DATA(upd_failed)
@@ -97,58 +100,77 @@ CLASS lhc_items IMPLEMENTATION.
                                Zpr13Curr = item-Zpr13Curr
                                Zpr14Curr = item-Zpr14Curr
                                Zpr15Curr = item-Zpr15Curr
-                               Criticality = '3'
+                               %control = VALUE #( Zp1Curr   = if_abap_behv=>mk-on
+                                                   ZgoCurr   = if_abap_behv=>mk-on
+                                                   ZpxCurr   = if_abap_behv=>mk-on
+                                                   Zpr02Curr   = if_abap_behv=>mk-on
+                                                   Zpr03Curr   = if_abap_behv=>mk-on
+                                                   Zpr04Curr   = if_abap_behv=>mk-on
+                                                   Zpr05Curr   = if_abap_behv=>mk-on
+                                                   Zpr06Curr   = if_abap_behv=>mk-on
+                                                   Zpr07Curr   = if_abap_behv=>mk-on
+                                                   Zpr08Curr   = if_abap_behv=>mk-on
+                                                   Zpr09Curr   = if_abap_behv=>mk-on
+                                                   Zpr10Curr   = if_abap_behv=>mk-on
+                                                   Zpr11Curr   = if_abap_behv=>mk-on
+                                                   Zpr12Curr   = if_abap_behv=>mk-on
+                                                   Zpr13Curr   = if_abap_behv=>mk-on
+                                                   Zpr14Curr   = if_abap_behv=>mk-on
+                                                   Zpr15Curr   = if_abap_behv=>mk-on
+                                                  )
                               ) )
          MAPPED upd_mapped
          FAILED upd_failed
          REPORTED upd_reported.
 
-*      SELECT * FROM zpr_impfg WHERE material IN @lr_material INTO TABLE @DATA(lt_config).
-*      IF sy-subrc EQ 0.
-*        SORT lt_config BY configmat ASCENDING.
-*        DELETE ADJACENT DUPLICATES FROM lt_config COMPARING configmat.
-*        DATA lt_impactedfg_new TYPE TABLE FOR CREATE zr_pr_auth2_head\_ImpactedGoods.
-*        READ TABLE keys INTO DATA(ls_key) INDEX 1.
-*        lt_impactedfg_new = VALUE #( (  %is_draft = ls_key-%is_draft
-*                                        PriceAuth = ls_key-PriceAuth
-*                                        %target   = VALUE #( FOR config IN lt_config (  %is_draft = ls_key-%is_draft
-*                                                                                        PriceAuth = ls_key-PriceAuth
-*                                                                                        Material  = config-configmat
-*                                                                                        ZP1New = 10
-*                                                                                        ZPXNew = 10
-*                                                                                        ZGoNew = 10
-*                                                                                        %control = VALUE #( PriceAuth   = if_abap_behv=>mk-on
-*                                                                                                            Material    = if_abap_behv=>mk-on
-*                                                                                                            ZP1New      = if_abap_behv=>mk-on
-*                                                                                                            ZPXNew      = if_abap_behv=>mk-on
-*                                                                                                            ZGoNew      = if_abap_behv=>mk-on ) ) ) ) ).
-*      ENDIF.
-*
-*      READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
-*      ENTITY Header
-*      BY \_ImpactedGoods
-*      ALL FIELDS WITH
-*      CORRESPONDING #( keys )
-*      RESULT DATA(lt_impactedfg_current).
-*
-*      "Delete already existing entries from child entity
-*      MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
-*      ENTITY ImpactedGoods
-*      DELETE FROM VALUE #( FOR ls_impactedfg IN lt_impactedfg_current (  %is_draft = ls_impactedfg-%is_draft
-*                                                                             %key  = ls_impactedfg-%key ) )
-*      MAPPED DATA(lt_mapped_delete)
-*      REPORTED DATA(lt_reported_delete)
-*      FAILED DATA(lt_failed_delete).
-*
-*      "Create records from newly extract data
-*      MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
-*      ENTITY Header
-*      CREATE BY \_ImpactedGoods
-*      AUTO FILL CID
-*      WITH lt_impactedfg_new
-*      MAPPED DATA(lt_item_mapped)
-*      REPORTED DATA(lt_item_reported)
-*      FAILED DATA(lt_item_failed).
+      SELECT * FROM zpr_impfg WHERE material IN @lr_material INTO TABLE @DATA(lt_config).
+      IF sy-subrc EQ 0.
+        SORT lt_config BY configmat ASCENDING.
+        DELETE ADJACENT DUPLICATES FROM lt_config COMPARING configmat.
+        DATA lt_impactedfg_new TYPE TABLE FOR CREATE zr_pr_auth2_head\_ImpactedGoods.
+        READ TABLE keys INTO DATA(ls_key) INDEX 1.
+        lt_impactedfg_new = VALUE #( (  %is_draft = ls_key-%is_draft
+                                        PriceAuth = ls_key-PriceAuth
+                                        %target   = VALUE #( FOR config IN lt_config (  %is_draft = ls_key-%is_draft
+                                                                                        PriceAuth = ls_key-PriceAuth
+                                                                                        Material  = config-configmat
+                                                                                        ZP1New = 10
+                                                                                        ZPXNew = 10
+                                                                                        ZGoNew = 10
+                                                                                        %control = VALUE #( PriceAuth   = if_abap_behv=>mk-on
+                                                                                                            Material    = if_abap_behv=>mk-on
+                                                                                                            ZP1New      = if_abap_behv=>mk-on
+                                                                                                            ZPXNew      = if_abap_behv=>mk-on
+                                                                                                            ZGoNew      = if_abap_behv=>mk-on ) ) ) ) ).
+      ENDIF.
+
+      READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+      ENTITY Header
+      BY \_ImpactedGoods
+      ALL FIELDS WITH
+      CORRESPONDING #( keys )
+      RESULT DATA(lt_impactedfg_current).
+
+      "Delete already existing entries from child entity
+      MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+      ENTITY ImpactedGoods
+      DELETE FROM VALUE #( FOR ls_impactedfg IN lt_impactedfg_current (  %is_draft = ls_impactedfg-%is_draft
+                                                                             %key  = ls_impactedfg-%key ) )
+      MAPPED DATA(lt_mapped_delete)
+      REPORTED DATA(lt_reported_delete)
+      FAILED DATA(lt_failed_delete).
+
+      "Create records from newly extract data
+      IF lt_impactedfg_new IS NOT INITIAL.
+        MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+        ENTITY Header
+        CREATE BY \_ImpactedGoods
+        AUTO FILL CID
+        WITH lt_impactedfg_new
+        MAPPED DATA(lt_item_mapped)
+        REPORTED DATA(lt_item_reported)
+        FAILED DATA(lt_item_failed).
+      ENDIF.
 
     ENDIF.
   ENDMETHOD.
@@ -174,6 +196,109 @@ CLASS lhc_items IMPLEMENTATION.
                                                      THEN if_abap_behv=>fc-o-enabled
                                                      ELSE if_abap_behv=>fc-o-disabled  )
                                                       ) ).
+  ENDMETHOD.
+
+  METHOD onDeleteMaterial.
+    DATA lr_material TYPE RANGE OF zmatnr.
+    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+        ENTITY Header
+        ALL FIELDS WITH CORRESPONDING #( keys )
+        RESULT DATA(lt_header)
+        BY \_Items
+        ALL FIELDS WITH CORRESPONDING #( keys )
+        RESULT DATA(lt_item).
+
+    SELECT * FROM zpr_csd_mat FOR ALL ENTRIES IN @lt_item WHERE material = @lt_item-material INTO TABLE @DATA(lt_material).
+
+    LOOP AT lt_item ASSIGNING FIELD-SYMBOL(<fs_item>).
+      READ TABLE lt_material INTO DATA(ls_material) WITH KEY material = <fs_item>-material.
+      IF sy-subrc EQ 0.
+        MOVE-CORRESPONDING ls_material TO <fs_item>.
+        APPEND INITIAL LINE TO lr_material ASSIGNING FIELD-SYMBOL(<fs_material>).
+        <fs_material>-sign = 'I'.
+        <fs_material>-option = 'EQ'.
+        <fs_material>-low = ls_material-material.
+      ENDIF.
+    ENDLOOP.
+
+    IF lr_material IS NOT INITIAL.
+
+      READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+      ENTITY Header
+      BY \_Items
+      ALL FIELDS WITH
+      CORRESPONDING #( keys )
+      RESULT DATA(lt_all_items).
+
+      DATA(lv_count) = lines( lt_all_items ).
+
+      SELECT * FROM zpr_impfg WHERE material IN @lr_material INTO TABLE @DATA(lt_config).
+      IF sy-subrc EQ 0.
+        SORT lt_config BY configmat ASCENDING.
+        DELETE ADJACENT DUPLICATES FROM lt_config COMPARING configmat.
+        DATA lt_impactedfg_new TYPE TABLE FOR CREATE zr_pr_auth2_head\_ImpactedGoods.
+        READ TABLE keys INTO DATA(ls_key) INDEX 1.
+        lt_impactedfg_new = VALUE #( (  %is_draft = ls_key-%is_draft
+                                        PriceAuth = ls_key-PriceAuth
+                                        %target   = VALUE #( FOR config IN lt_config (  %is_draft = ls_key-%is_draft
+                                                                                        PriceAuth = ls_key-PriceAuth
+                                                                                        Material  = config-configmat
+                                                                                        ZP1New = 10
+                                                                                        ZPXNew = 10
+                                                                                        ZGoNew = 10
+                                                                                        %control = VALUE #( PriceAuth   = if_abap_behv=>mk-on
+                                                                                                            Material    = if_abap_behv=>mk-on
+                                                                                                            ZP1New      = if_abap_behv=>mk-on
+                                                                                                            ZPXNew      = if_abap_behv=>mk-on
+                                                                                                            ZGoNew      = if_abap_behv=>mk-on ) ) ) ) ).
+      ENDIF.
+
+    ELSE.
+
+      lv_count = 0.
+
+    ENDIF.
+
+    READ ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+      ENTITY Header
+      BY \_ImpactedGoods
+      ALL FIELDS WITH
+      CORRESPONDING #( keys )
+      RESULT DATA(lt_impactedfg_current).
+
+    "Delete already existing entries from child entity
+    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+    ENTITY ImpactedGoods
+    DELETE FROM VALUE #( FOR ls_impactedfg IN lt_impactedfg_current (  %is_draft = ls_impactedfg-%is_draft
+                                                                           %key  = ls_impactedfg-%key ) )
+    MAPPED DATA(lt_mapped_delete)
+    REPORTED DATA(lt_reported_delete)
+    FAILED DATA(lt_failed_delete).
+
+    "Create records from newly extract data
+    IF lt_impactedfg_new IS NOT INITIAL.
+      MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+      ENTITY Header
+      CREATE BY \_ImpactedGoods
+      AUTO FILL CID
+      WITH lt_impactedfg_new
+      MAPPED DATA(lt_item_mapped)
+      REPORTED DATA(lt_item_reported)
+      FAILED DATA(lt_item_failed).
+    ENDIF.
+
+    MODIFY ENTITIES OF zr_pr_auth2_head IN LOCAL MODE
+         ENTITY Header
+           UPDATE
+             FIELDS ( Materialcount )
+             WITH VALUE #( FOR header IN lt_header
+                             ( %tky    = header-%tky
+                               Materialcount = lv_count
+                               %control = VALUE #( Materialcount   = if_abap_behv=>mk-on ) ) )
+         MAPPED DATA(upd_mapped)
+         FAILED DATA(upd_failed)
+         REPORTED DATA(upd_reported).
+
   ENDMETHOD.
 
 ENDCLASS.
